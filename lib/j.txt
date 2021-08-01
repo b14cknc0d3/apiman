@@ -1,0 +1,1 @@
+{\n"latest_post": [{\n"id": 6, "author": {\n"username": "test", "external_id": "1241c081-1584-43a3-be8c-65cd73953890", "id": 1, "email": "test@test.com"}, "created_at": "2021-07-11T07:43:06.842866Z", "body": "<p>#python</p>\r\n<p>testing post</p>", "viewed": false, "viewed_by": 1, "total_viewed_by": []}]}
