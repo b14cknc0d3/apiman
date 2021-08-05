@@ -8,16 +8,16 @@ import 'package:websocket_tester/utils/highlight.dart';
 import 'package:flutter_html/flutter_html.dart';
 import 'package:websocket_tester/widgets/dialogButton.dart';
 
-class ApiPagedata extends StatefulWidget {
+class ApiPagedata2 extends StatefulWidget {
   // final String pageNum;
-  const ApiPagedata({Key? key}) : super(key: key);
+  const ApiPagedata2({Key? key}) : super(key: key);
 
   @override
-  _ApiPagedataState createState() => _ApiPagedataState();
+  _ApiPagedata2State createState() => _ApiPagedata2State();
 }
 
-class _ApiPagedataState extends State<ApiPagedata>
-    with AutomaticKeepAliveClientMixin<ApiPagedata> {
+class _ApiPagedata2State extends State<ApiPagedata2>
+    with AutomaticKeepAliveClientMixin<ApiPagedata2> {
   final TextEditingController _pathController1 =
       TextEditingController(text: "http");
   final TextEditingController _headerController1 =

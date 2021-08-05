@@ -1,9 +1,11 @@
+import 'dart:collection';
+
 import 'package:flutter/material.dart';
 import 'package:websocket_tester/ui/screens/api/apiPageData.dart';
 
 class TabIcon extends StatelessWidget {
-  final Function(List) callback;
-  final List<ApiPagedata> tabs;
+  final Function(Map) callback;
+  final Map<String, ApiPagedata> tabs;
   final int idx;
   const TabIcon({
     Key? key,
@@ -28,7 +30,9 @@ class TabIcon extends StatelessWidget {
           // ),
           onPressed: () {
             print("idx to delete:$idx");
-            tabs.removeAt(idx);
+            String key = tabs.keys.elementAt(idx);
+            tabs.remove(key);
+            print(tabs);
             callback(tabs);
           },
           icon: Icon(
