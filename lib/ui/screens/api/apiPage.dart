@@ -2,11 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:tabbed_view/tabbed_view.dart';
 
 import 'package:websocket_tester/ui/screens/api/apiPageData.dart';
-import 'package:websocket_tester/ui/screens/api/apiPageData2.dart';
-import 'package:websocket_tester/widgets/ActionMenu.dart';
 
-import 'package:websocket_tester/widgets/customTabBarView.dart';
-import 'package:websocket_tester/widgets/tabIcons.dart';
+import 'package:websocket_tester/widgets/ActionMenu.dart';
 
 class ApiPage extends StatelessWidget {
   @override
@@ -30,17 +27,11 @@ class _ApiViewState extends State<ApiView> with TickerProviderStateMixin {
     TabData(text: "default", content: ApiPagedata(), closable: false)
   ];
   late TabbedViewController _model;
-  // List<Tab> tabs = [];
-  TabController? tabController;
 
-  // // ignore: unused_field
-  int _currentPosition = 0;
   int pageCount = 1;
 
   @override
   void dispose() {
-    tabController!.dispose();
-
     super.dispose();
   }
 
@@ -59,9 +50,20 @@ class _ApiViewState extends State<ApiView> with TickerProviderStateMixin {
     super.initState();
   }
 
+  bool _onTabClosing(int tabIndex) {
+    if (tabIndex == 0) {
+      print('The tab $tabIndex is busy and cannot be closed.');
+      return false;
+    }
+    print('Closing tab $tabIndex...');
+    return true;
+  }
+
   @override
   Widget build(BuildContext context) {
     TabbedViewTheme theme = TabbedViewTheme();
+
+    theme.menu.ellipsisOverflowText = true;
     theme.tabsArea
       ..border = Border(
           bottom: BorderSide(color: Theme.of(context).primaryColor, width: 1))
@@ -72,8 +74,12 @@ class _ApiViewState extends State<ApiView> with TickerProviderStateMixin {
         BorderRadius.only(topLeft: radius, topRight: radius);
 
     theme.tabsArea.tab
+      ..textStyle = TextStyle(color: Colors.black, fontWeight: FontWeight.w300)
+      ..verticalAlignment = VerticalAlignment.top
       ..padding = EdgeInsets.fromLTRB(10, 4, 10, 4)
       ..buttonsOffset = 8
+      // ..buttonIconSize = 24
+      // ..buttonsGap = 4
       ..decoration = BoxDecoration(
           shape: BoxShape.rectangle,
           color: Colors.green[100],
@@ -84,16 +90,36 @@ class _ApiViewState extends State<ApiView> with TickerProviderStateMixin {
       ..highlightedStatus.decoration =
           BoxDecoration(color: Colors.green[50], borderRadius: borderRadius);
 
-    // super.build(context);
     TabbedView tabbedView = TabbedView(
-      controller: _model,
-      theme: theme,
-      contentBuilder: (ctx, idx) => IndexedStack(
-        index: _model.selectedIndex,
-        // controller: tabController,
-        children: tabs.map((e) => e.content!).toList(),
-      ),
-    );
+        onTabClosing: _onTabClosing,
+        controller: _model,
+        theme: theme,
+        contentBuilder: (ctx, idx) => IndexedStack(
+              index: _model.selectedIndex,
+              children: tabs.map((e) => e.content!).toList(),
+            ),
+        tabsAreaButtonsBuilder: (context, tabsCount) {
+          List<TabButton> buttons = [];
+          buttons.add(TabButton(
+              icon: Icons.add,
+              onPressed: () {
+                // int millisecond = DateTime.now().millisecondsSinceEpoch;
+                _model.addTab(TabData(
+                  text: 'Tab ${tabsCount + 1}',
+                  content: ApiPagedata(),
+                ));
+              }));
+          // if (tabsCount > 0) {
+          //   buttons.add(TabButton(
+          //       icon: Icons.delete,
+          //       onPressed: () {
+          //         if (_model.selectedIndex != null) {
+          //           _model.removeTab(_model.selectedIndex!);
+          //         }
+          //       }));
+          // }
+          return buttons;
+        });
 
     return Scaffold(
         body: Padding(
