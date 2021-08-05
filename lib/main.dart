@@ -6,6 +6,9 @@ import 'package:web_socket_channel/io.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:websocket_tester/test_bloc/ws_api_loader.dart';
+import 'package:websocket_tester/ui/screens/api/apiPage.dart';
+import 'package:websocket_tester/ui/screens/api/settings/settings.dart';
+import 'package:websocket_tester/widgets/splash.dart';
 
 void main() => runApp(const MyApp());
 
@@ -15,15 +18,32 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     const title = 'ApiMan';
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      title: title,
-      home: MyHomePage(
-        title: title,
-      ),
-      // theme: ThemeData.light(),
-      color: Colors.green,
-    );
+    return FutureBuilder(
+        future: Future.delayed(Duration(milliseconds: 300)),
+        builder: (BuildContext context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return MaterialApp(
+              home: Splash(),
+              title: title,
+            );
+          } else {
+            return MaterialApp(
+              debugShowCheckedModeBanner: false,
+              title: title,
+              home: MyHomePage(
+                title: title,
+              ),
+              theme: ThemeData(
+                  buttonTheme: ButtonThemeData(
+                    highlightColor: Theme.of(context).primaryColor,
+                  ),
+                  primaryColor: Color(0xFF33691e),
+                  primaryColorLight: Color(0xff629749),
+                  primaryColorDark: Color(0xff003d00)),
+              // color: Color(0xff33691e),
+            );
+          }
+        });
   }
 }
 
@@ -45,11 +65,11 @@ class _MyHomePageState extends State<MyHomePage> {
 
   final TextEditingController _pathController = TextEditingController();
   final TextEditingController _headerController = TextEditingController();
-  final PageController _pageController = PageController();
+  // final PageController _pageController = PageController();
   var _selectedIndex = 0;
   final WsAPiLoader wsAPiLoader = WsAPiLoader();
   IOWebSocketChannel? _channel;
-  String? headers;
+  var headers;
   bool isConnected = false;
   String error = "";
   @override
@@ -57,7 +77,7 @@ class _MyHomePageState extends State<MyHomePage> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        backgroundColor: Colors.green,
+        backgroundColor: Color(0xFF33691e),
         title: Text(
           widget.title,
           style: GoogleFonts.righteous(
@@ -65,18 +85,14 @@ class _MyHomePageState extends State<MyHomePage> {
           ),
         ),
       ),
-      body: PageView(
-        controller: _pageController,
+      body: IndexedStack(
+        // controller: _pageController,
         children: [
           _webSocketPage(),
-          ApiPageView(),
-          SettingView(),
+          ApiPage(),
+          SettingsScreen(),
         ],
-        onPageChanged: (page) {
-          setState(() {
-            _selectedIndex = page;
-          });
-        },
+        index: _selectedIndex,
       ),
       bottomNavigationBar: _bottomNavigationBar(),
     );
@@ -150,6 +166,9 @@ class _MyHomePageState extends State<MyHomePage> {
                   ? SizedBox(
                       width: 70,
                       child: ElevatedButton(
+                        style: ButtonStyle(
+                            backgroundColor: MaterialStateProperty.all(
+                                Theme.of(context).primaryColor)),
                         onPressed: () {
                           setState(() {
                             _channel =
@@ -157,12 +176,15 @@ class _MyHomePageState extends State<MyHomePage> {
                             isConnected = true;
                           });
                         },
-                        child: Text("Connect"),
+                        child: Text("connect"),
                       ),
                     )
                   : SizedBox(
                       width: 70,
                       child: ElevatedButton(
+                        style: ButtonStyle(
+                            backgroundColor: MaterialStateProperty.all(
+                                Theme.of(context).primaryColor)),
                         onPressed: () {
                           setState(() {
                             _channel?.sink.close();
@@ -232,6 +254,9 @@ class _MyHomePageState extends State<MyHomePage> {
               SizedBox(
                 width: 70,
                 child: ElevatedButton(
+                  style: ButtonStyle(
+                      backgroundColor: MaterialStateProperty.all(
+                          Theme.of(context).primaryColor)),
                   onPressed: () {
                     _sendMessage();
                   },
@@ -273,33 +298,69 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   Widget _bottomNavigationBar() {
-    return BottomNavigationBar(
-      items: [
-        BottomNavigationBarItem(
-            icon: Icon(Icons.web_asset), label: 'websocket'),
-        BottomNavigationBarItem(icon: Icon(Icons.home), label: 'api'),
-        BottomNavigationBarItem(icon: Icon(Icons.settings), label: 'settings'),
-      ],
-      onTap: _onTappedBar,
-      selectedItemColor: Colors.orange,
-      currentIndex: _selectedIndex,
-    );
+    bool bap = true;
+    return bap == true
+        ? BottomNavigationBar(
+            items: [
+              BottomNavigationBarItem(
+                  icon: Icon(Icons.web), label: 'websocket'),
+              BottomNavigationBarItem(icon: Icon(Icons.public), label: 'api'),
+              BottomNavigationBarItem(
+                  icon: Icon(Icons.settings), label: 'settings'),
+            ],
+            onTap: _onTappedBar,
+            selectedItemColor: Color(0xff629749),
+            currentIndex: _selectedIndex,
+          )
+        : BottomAppBar(
+            notchMargin: 2.0,
+            shape: CircularNotchedRectangle(),
+            child: Container(
+              height: 75,
+              child: Row(
+                // mainAxisSize: MainAxisSize.min,
+                // crossAxisAlignment: CrossAxisAlignment.start,
+                // mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  IconButton(
+                      icon: Icon(
+                        Icons.web,
+                        size: 40,
+                        color: Theme.of(context).primaryColorLight,
+                      ),
+                      onPressed: () {
+                        _onTappedBar(0);
+                      }),
+                  // Spacer(),
+                  IconButton(
+                      icon: Icon(
+                        Icons.public,
+                        size: 40,
+                        color: Theme.of(context).primaryColorLight,
+                      ),
+                      onPressed: () {
+                        _onTappedBar(1);
+                      }),
+                  IconButton(
+                      icon: Icon(
+                        Icons.settings,
+                        size: 40,
+                        color: Theme.of(context).primaryColorLight,
+                      ),
+                      onPressed: () {
+                        _onTappedBar(2);
+                      }),
+                ],
+              ),
+            ),
+          );
   }
 
   void _onTappedBar(int value) {
     setState(() {
       _selectedIndex = value;
     });
-    _pageController.jumpToPage(value);
-  }
-}
-
-class ApiPageView extends StatelessWidget {
-  const ApiPageView({Key? key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Container();
+    // _pageController.jumpToPage(value);
   }
 }
 

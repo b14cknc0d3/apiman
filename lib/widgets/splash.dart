@@ -1,0 +1,24 @@
+import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
+
+class Splash extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Container(
+        color: Color(0xff33691e),
+        child: Center(
+          // child: Icon(
+          //   Icons.apartment_outlined,
+          //   size: MediaQuery.of(context).size.width * 0.785,
+          // ),
+          child: Text(
+            "ApiMan",
+            style: GoogleFonts.righteous(
+                color: Colors.white, fontWeight: FontWeight.bold, fontSize: 40),
+          ),
+        ),
+      ),
+    );
+  }
+}
