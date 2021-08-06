@@ -68,8 +68,26 @@ class _ApiViewState extends State<ApiView> with TickerProviderStateMixin {
   Widget build(BuildContext context) {
     TabbedViewTheme theme = TabbedViewTheme();
 
-    theme.menu.ellipsisOverflowText = true;
+    theme.menu
+      ..dividerThickness = 2.0
+      // ..border = Border.all(
+      //   width: 2.0,
+      //   style: BorderStyle.solid,
+      // )
+      // ..border = Bor
+      ..textStyle = TextStyle(
+        color: Colors.black,
+      )
+
+      // ..color = Colors.black
+      ..hoverColor = Theme.of(context).primaryColor
+      ..dividerColor = Colors.black
+      ..ellipsisOverflowText = true;
+    // theme.buttonArea
+
     theme.tabsArea
+      // ..tab.
+      // ..padding =EdgeInsets.only(butt),
       ..border = Border(
           bottom: BorderSide(color: Theme.of(context).primaryColor, width: 1))
       ..middleGap = 3;
@@ -94,6 +112,9 @@ class _ApiViewState extends State<ApiView> with TickerProviderStateMixin {
           borderRadius: borderRadius)
       ..highlightedStatus.decoration =
           BoxDecoration(color: Colors.green[50], borderRadius: borderRadius);
+
+    theme.tabsArea.buttonsArea..padding = EdgeInsets.only(bottom: 8, right: 8);
+    // ..decoration = BoxDecoration(color: Theme.of(context).primaryColor);
 
     TabbedView tabbedView = TabbedView(
         onTabClosing: _onTabClosing,

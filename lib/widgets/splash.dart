@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_html/flutter_html.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class Splash extends StatelessWidget {
@@ -14,8 +15,13 @@ class Splash extends StatelessWidget {
           // ),
           child: Text(
             "ApiMan",
-            style: GoogleFonts.righteous(
-                color: Colors.white, fontWeight: FontWeight.bold, fontSize: 40),
+            style: TextStyle(
+                color: Colors.white,
+                fontFamily: "Righteous",
+                fontWeight: FontWeight.bold,
+                fontSize: 40),
+            //   style: GoogleFonts.righteous(
+            //       color: Colors.white, fontWeight: FontWeight.bold, fontSize: 40),
           ),
         ),
       ),

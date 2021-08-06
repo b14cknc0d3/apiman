@@ -76,12 +76,19 @@ class _ApiPagedataState extends State<ApiPagedata>
                   content: Row(
                     children: [
                       Padding(
-                        padding: EdgeInsets.only(left: 8.0, right: 8.0),
-                        child: Icon(
-                          Icons.sync_rounded,
-                          color: Colors.white,
-                        ),
-                      ),
+                          padding: EdgeInsets.only(left: 8.0, right: 8.0),
+                          child: SizedBox(
+                            height: 12,
+                            width: 12,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2.0,
+                            ),
+                          )
+                          //  Icon(
+                          //   Icons.sync_rounded,
+                          //   color: Colors.white,
+                          // ),
+                          ),
                       Text('submitting...', style: TextStyle()),
                     ],
                   ),
@@ -276,32 +283,24 @@ class _ApiPagedataState extends State<ApiPagedata>
                 ? SizedBox(
                     width: 70,
                     child: ElevatedButton(
-                      style: ButtonStyle(
-                          backgroundColor: MaterialStateProperty.all(
-                              Theme.of(context).primaryColor)),
+                      style: ButtonStyle(backgroundColor:
+                          MaterialStateProperty.resolveWith<Color>(
+                              (Set<MaterialState> states) {
+                        if (states.contains(MaterialState.pressed))
+                          return Theme.of(context).primaryColor.withOpacity(1);
+                        else if (states.contains(MaterialState.disabled))
+                          return Colors.black26;
+                        return Theme.of(context).primaryColor; //
+                      })),
                       onPressed: state.status.isValidated
                           ? () {
-                              // url = _pathController1.text.trim();
-
-                              // hMap = _headerController1.text.trim();
-
-                              // data = _dataController1.text.trim();
-                              // print("---data--from----state---before---submit");
-                              // print("${state.url.value}");
-                              // print("${state.header.value}");
-                              // print("${state.body.value}");
-                              // print("${state.method.value}");
-                              // print("------end-----ds");
                               context.read<ApimanformCubit>().formSummits();
-                              //   .add(SubmittedEvent(
-                              //         url!,
-                              //         hMap,
-                              //         data,
-                              //         ddbValue ?? "get",
-                              //       ));
                             }
                           : null,
-                      child: Text("connect"),
+                      child: Text(
+                        "connect",
+                        style: TextStyle(),
+                      ),
                     ),
                   )
                 : SizedBox(
