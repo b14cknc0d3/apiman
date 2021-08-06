@@ -1,16 +1,46 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:flutter/foundation.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:web_socket_channel/io.dart';
 
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:websocket_tester/bloc_observer.dart';
 import 'package:websocket_tester/test_bloc/ws_api_loader.dart';
 import 'package:websocket_tester/ui/screens/api/apiPage.dart';
 import 'package:websocket_tester/ui/screens/api/settings/settings.dart';
 import 'package:websocket_tester/widgets/splash.dart';
+import 'package:sqflite_common_ffi/sqflite_ffi.dart';
+import 'package:sqflite/sqflite.dart' show databaseFactory;
+import 'dart:io';
+import 'dart:ffi';
+import 'package:sqlite3/open.dart';
+import 'package:sqlite3/sqlite3.dart' hide Row;
+import 'package:sqlite3_library_windows/sqlite3_library_windows.dart';
 
-void main() => runApp(const MyApp());
+// late final Database db;
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  Bloc.observer = MyBlocObserver();
+  if ((defaultTargetPlatform == TargetPlatform.windows ||
+          defaultTargetPlatform == TargetPlatform.linux) &&
+      !kIsWeb) {
+    // Initialize FFI
+    if (defaultTargetPlatform == TargetPlatform.linux) {
+      // sqfliteFfiInit();
+    } else if (defaultTargetPlatform == TargetPlatform.windows) {
+      open.overrideFor(OperatingSystem.windows, openSQLiteOnWindows);
+      final db = sqlite3.openInMemory();
+      db.dispose();
+    }
+
+    // Change the default factory
+    databaseFactory = databaseFactoryFfi;
+  }
+  runApp(const MyApp());
+}
 
 class MyApp extends StatelessWidget {
   const MyApp({Key? key}) : super(key: key);
@@ -34,12 +64,17 @@ class MyApp extends StatelessWidget {
                 title: title,
               ),
               theme: ThemeData(
-                  buttonTheme: ButtonThemeData(
-                    highlightColor: Theme.of(context).primaryColor,
-                  ),
-                  primaryColor: Color(0xFF33691e),
-                  primaryColorLight: Color(0xff629749),
-                  primaryColorDark: Color(0xff003d00)),
+                buttonTheme: ButtonThemeData(
+                  highlightColor: Theme.of(context).primaryColor,
+                ),
+                primaryColor: Color(0xFF33691e),
+                primaryColorLight: Color(0xff629749),
+                primaryColorDark: Color(0xff003d00),
+                snackBarTheme: SnackBarThemeData(
+                  contentTextStyle: TextStyle(color: Colors.white),
+                  backgroundColor: Color(0xFF33691e),
+                ),
+              ),
               // color: Color(0xff33691e),
             );
           }
@@ -372,3 +407,11 @@ class SettingView extends StatelessWidget {
     return Container();
   }
 }
+
+// DynamicLibrary _openSqliteUnderWindows() {
+//   final scriptDir = File(Platform.script.toFilePath()).parent;
+//   // ignore: non_constant_identifier_names
+//   print("${scriptDir.path}");
+//   final LibraryNextoScript = File('${scriptDir.path}/sqlite3.dll');
+//   return DynamicLibrary.open(LibraryNextoScript.path);
+// }

@@ -1,6 +1,6 @@
 import 'dart:io';
 
-import 'package:path/path.dart';
+import 'package:path/path.dart' as p;
 import 'package:sqflite/sqflite.dart';
 import 'package:path_provider/path_provider.dart';
 
@@ -15,6 +15,8 @@ class DatabaseHelper {
   static final columnMethod = 'method';
   static final columnHeaders = 'headers';
   static final columnBody = 'body';
+  static final columnResult = 'result';
+  static final columnTabId = 'tabId';
 
   // make this a singleton class
   DatabaseHelper._privateConstructor();
@@ -31,9 +33,14 @@ class DatabaseHelper {
 
   // this opens the database (and creates it if it doesn't exist)
   _initDatabase() async {
+    String dbPath = await getDatabasesPath();
+    String dataPath = p.join(dbPath, _databaseName);
+    print(dataPath);
+
     Directory documentsDirectory = await getApplicationDocumentsDirectory();
-    String path = join(documentsDirectory.path, _databaseName);
-    return await openDatabase(path,
+    String path = p.join(documentsDirectory.path, _databaseName);
+    print(path);
+    return await openDatabase(dataPath,
         version: _databaseVersion, onCreate: _onCreate);
   }
 
@@ -46,6 +53,8 @@ class DatabaseHelper {
   ,$columnUrl      VARCHAR(225) 
   ,$columnHeaders  TEXT
   ,$columnBody     TEXT
+  ,$columnResult TEXT
+  ,$columnTabId   INT
 );
           ''');
   }
@@ -57,7 +66,8 @@ class DatabaseHelper {
   // inserted row.
   Future<int> insert(Map<String, dynamic> row) async {
     Database db = await instance.database;
-    return await db.insert(table, row);
+    return await db.insert(table, row,
+        conflictAlgorithm: ConflictAlgorithm.replace, nullColumnHack: "");
   }
 
   // All of the rows are returned as a list of maps, where each map is

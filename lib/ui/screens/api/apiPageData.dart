@@ -1,16 +1,22 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_highlight/themes/github.dart';
 import 'package:websocket_tester/api_service/apiLoader.dart';
 import 'package:websocket_tester/database/database.dart';
+// import 'package:websocket_tester/ui/screens/api/form_bloc/bloc/apimanform_bloc.dart';
+import 'package:websocket_tester/ui/screens/api/form_bloc/cubit/apimanform_cubit.dart';
 import 'package:websocket_tester/utils/highlight.dart';
 import 'package:flutter_html/flutter_html.dart';
 import 'package:websocket_tester/widgets/dialogButton.dart';
+import 'package:formz/formz.dart';
 
 class ApiPagedata extends StatefulWidget {
   // final String pageNum;
-  const ApiPagedata({Key? key}) : super(key: key);
+
+  final int tabId;
+  const ApiPagedata({Key? key, required this.tabId}) : super(key: key);
 
   @override
   _ApiPagedataState createState() => _ApiPagedataState();
@@ -57,18 +63,88 @@ class _ApiPagedataState extends State<ApiPagedata>
       lang = "json";
     }
 
-    return Column(
-      children: [
-        Divider(),
-        _buildUrlRow(),
-        Divider(),
-        _headerBox(),
-        Divider(),
-        _dataBox(),
-        Divider(),
-        _buildStatusBar(),
-        _outPutBox()
-      ],
+    return BlocProvider(
+      create: (context) => ApimanformCubit(apiLoader: apiLoader),
+      child: BlocListener<ApimanformCubit, ApimanformState>(
+        listener: (context, state) {
+          if (state.status.isSubmissionInProgress) {
+            ScaffoldMessenger.of(context)
+              ..hideCurrentSnackBar()
+              ..showSnackBar(
+                SnackBar(
+                  // backgroundColor:const Theme.of(context).primaryColor,
+                  content: Row(
+                    children: [
+                      Padding(
+                        padding: EdgeInsets.only(left: 8.0, right: 8.0),
+                        child: Icon(
+                          Icons.sync_rounded,
+                          color: Colors.white,
+                        ),
+                      ),
+                      Text('submitting...', style: TextStyle()),
+                    ],
+                  ),
+                ),
+              );
+          } else if (state.status.isSubmissionFailure) {
+            ScaffoldMessenger.of(context)
+              ..hideCurrentSnackBar()
+              ..showSnackBar(
+                SnackBar(
+                  content: Row(
+                    children: [
+                      Padding(
+                        padding: EdgeInsets.only(left: 8.0, right: 8.0),
+                        child: Icon(
+                          Icons.cancel,
+                          color: Colors.white,
+                        ),
+                      ),
+                      Text('submission failed!...', style: TextStyle()),
+                    ],
+                  ),
+                ),
+              );
+          } else if (state.status.isSubmissionSuccess) {
+            setState(() {
+              result = state.result;
+            });
+            // print(state.result);
+            ScaffoldMessenger.of(context)
+              ..hideCurrentSnackBar()
+              ..showSnackBar(
+                SnackBar(
+                  content: Row(
+                    children: [
+                      Padding(
+                        padding: EdgeInsets.only(left: 8.0, right: 8.0),
+                        child: Icon(
+                          Icons.check_circle,
+                          color: Colors.white,
+                        ),
+                      ),
+                      Text('submission success!...', style: TextStyle()),
+                    ],
+                  ),
+                ),
+              );
+          }
+        },
+        child: Column(
+          children: [
+            Divider(),
+            _buildUrlRow(),
+            Divider(),
+            _headerBox(),
+            Divider(),
+            _dataBox(),
+            Divider(),
+            _buildStatusBar(),
+            _outPutBox()
+          ],
+        ),
+      ),
     );
   }
 
@@ -81,6 +157,9 @@ class _ApiPagedataState extends State<ApiPagedata>
             child: Form(
               child: TextFormField(
                 // initialValue: "{}",
+                onChanged: (value) {
+                  context.read<ApimanformCubit>().headerChanged(value);
+                },
                 controller: _headerController1,
                 decoration: InputDecoration(
                     border: UnderlineInputBorder(),
@@ -98,239 +177,197 @@ class _ApiPagedataState extends State<ApiPagedata>
   }
 
   Widget _dataBox() {
-    return Row(
-      children: [
-        Expanded(
-          child: Padding(
-            padding: EdgeInsets.only(left: 8, right: 8.0, top: 8, bottom: 8),
-            child: Form(
-              child: TextFormField(
-                // smartQuotesType: SmartQuotesType.enabled,
-                // onChanged: (value) {
-                //   setState(() {
-                //     data = value;
-                //   });
-                // },
-                controller: _dataController1,
-                // initialValue: "{}",
+    return BlocBuilder<ApimanformCubit, ApimanformState>(
+      builder: (context, state) {
+        return Row(
+          children: [
+            Expanded(
+              child: Padding(
+                padding:
+                    EdgeInsets.only(left: 8, right: 8.0, top: 8, bottom: 8),
+                child: Form(
+                  child: TextFormField(
+                    // smartQuotesType: SmartQuotesType.enabled,
+                    onChanged: (value) {
+                      context.read<ApimanformCubit>().bodyChanged(value);
+                    },
+                    controller: _dataController1,
+
+                    decoration: InputDecoration(
+                        border: UnderlineInputBorder(),
+                        // border: OutlineInputBorder(
+                        //   borderRadius:
+                        //       BorderRadius.all(Radius.circular(4.0)),
+                        // ),
+                        labelText: 'body'),
+                  ),
+                ),
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  _buildUrlRow() {
+    return BlocBuilder<ApimanformCubit, ApimanformState>(
+        builder: (context, state) {
+      return Row(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        crossAxisAlignment: CrossAxisAlignment.end,
+        children: [
+          Padding(
+            padding: const EdgeInsets.only(left: 8.0),
+            child: DropdownButton<String>(
+              focusNode: FocusNode(),
+              // style: TextStyle(backgroundColor: Theme.of(context).primaryColor),
+              focusColor: Theme.of(context).primaryColor,
+              // dropdownColor: Theme.of(context).primaryColor,
+              iconEnabledColor: Theme.of(context).primaryColor,
+              value: ddbValue,
+              items: <String>["get", "post", "put", "patch", "head", "options"]
+                  .map((String value) {
+                return DropdownMenuItem(
+                  child: Text(value),
+                  value: value,
+                );
+              }).toList(),
+              onChanged: (value) {
+                setState(() {
+                  ddbValue = value;
+                });
+                context
+                    .read<ApimanformCubit>()
+                    .methodChanged(ddbValue ?? "get");
+
+                // TODO :delete-------//
+                // setState(() {
+                //   print(ddbValue);
+                //   ddbValue = value;
+                // });
+                //--------------------//
+              },
+            ),
+          ),
+          Expanded(
+            child: Padding(
+              padding:
+                  EdgeInsets.only(left: 30, right: 30.0, top: 8, bottom: 8),
+              child: Form(
+                  child: TextFormField(
+                onChanged: (value) {
+                  context.read<ApimanformCubit>().urlChanged(value);
+                },
+                controller: _pathController1,
                 decoration: InputDecoration(
                     border: UnderlineInputBorder(),
                     // border: OutlineInputBorder(
                     //   borderRadius:
                     //       BorderRadius.all(Radius.circular(4.0)),
                     // ),
-                    labelText: 'body'),
-              ),
+                    labelText: 'enter url'),
+              )),
             ),
           ),
-        ),
-      ],
-    );
-  }
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: !state.status.isSubmissionInProgress
+                ? SizedBox(
+                    width: 70,
+                    child: ElevatedButton(
+                      style: ButtonStyle(
+                          backgroundColor: MaterialStateProperty.all(
+                              Theme.of(context).primaryColor)),
+                      onPressed: state.status.isValidated
+                          ? () {
+                              // url = _pathController1.text.trim();
 
-  _buildUrlRow() {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-      crossAxisAlignment: CrossAxisAlignment.end,
-      children: [
-        Padding(
-          padding: const EdgeInsets.only(left: 8.0),
-          child: DropdownButton<String>(
-            focusNode: FocusNode(),
-            // style: TextStyle(backgroundColor: Theme.of(context).primaryColor),
-            focusColor: Theme.of(context).primaryColor,
-            // dropdownColor: Theme.of(context).primaryColor,
-            iconEnabledColor: Theme.of(context).primaryColor,
-            value: ddbValue,
-            items: <String>["get", "post", "put", "patch", "head", "options"]
-                .map((String value) {
-              return DropdownMenuItem(
-                child: Text(value),
-                value: value,
-              );
-            }).toList(),
-            onChanged: (value) {
-              setState(() {
-                print(ddbValue);
-                ddbValue = value;
-              });
-            },
-          ),
-        ),
-        Expanded(
-          child: Padding(
-            padding: EdgeInsets.only(left: 30, right: 30.0, top: 8, bottom: 8),
-            child: Form(
-                child: TextFormField(
-              controller: _pathController1,
-              decoration: InputDecoration(
-                  border: UnderlineInputBorder(),
-                  // border: OutlineInputBorder(
-                  //   borderRadius:
-                  //       BorderRadius.all(Radius.circular(4.0)),
-                  // ),
-                  labelText: 'enter url'),
-            )),
-          ),
-        ),
-        Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: !isConnected
-              ? SizedBox(
-                  width: 70,
-                  child: ElevatedButton(
-                    style: ButtonStyle(
-                        backgroundColor: MaterialStateProperty.all(
-                            Theme.of(context).primaryColor)),
-                    onPressed: () async {
-                      setState(() {
-                        url = _pathController1.text.trim();
+                              // hMap = _headerController1.text.trim();
 
-                        hMap = _headerController1.text.trim();
-
-                        data = _dataController1.text.trim();
-
-                        isConnected = true;
-                      });
-                      var h = _jsonDecoder(hMap);
-                      var d = _jsonDecoder(data);
-
-                      switch (ddbValue) {
-                        case "get":
-                          final r = await apiLoader.get("$url", h);
-                          setState(() {
-                            result = r;
-                          });
-
-                          break;
-                        case "post":
-                          final r = await apiLoader.post("$url", d, h);
-                          setState(() {
-                            result = r;
-                          });
-
-                          break;
-                        case "put":
-                          final r = await apiLoader.put("$url", d, h);
-                          setState(() {
-                            result = r;
-                          });
-
-                          break;
-                        case "patch":
-                          final r = await apiLoader.patch("$url", d, h);
-                          setState(() {
-                            result = r;
-                          });
-                          break;
-                        case "delete":
-                          final r = await apiLoader.delete("$url", d, h);
-                          setState(() {
-                            result = r;
-                          });
-
-                          break;
-
-                        case "head":
-                          final r = await apiLoader.post("$url", d, h);
-                          setState(() {
-                            result = r;
-                          });
-
-                          break;
-                        case "options":
-                          final r = await apiLoader.post("$url", d, h);
-                          setState(() {
-                            result = r;
-                          });
-
-                          break;
-                        default:
-                          final r = await apiLoader.get("$url", h);
-                          setState(() {
-                            result = r;
-                          });
-
-                          break;
-                      }
-                    },
-                    child: Text("connect"),
-                  ),
-                )
-              : result != null
-                  ? SizedBox(
-                      width: 70,
-                      child: ElevatedButton(
-                        style: ButtonStyle(
-                            backgroundColor: MaterialStateProperty.all(
-                                Theme.of(context).primaryColor)),
-                        onPressed: () {
-                          setState(() {
-                            isConnected = false;
-                          });
-                        },
-                        child: Text(
-                          "Cancle",
-                          softWrap: true,
-                        ),
-                      ),
-                    )
-                  : SizedBox(
-                      width: 70,
-                      child: ElevatedButton(
-                        style: ButtonStyle(
-                            backgroundColor: MaterialStateProperty.all(
-                                Theme.of(context).primaryColor)),
-                        onPressed: null,
-                        child: Padding(
-                          padding: const EdgeInsets.all(3.0),
-                          child: CircularProgressIndicator(
-                              backgroundColor: Colors.white),
-                        ),
+                              // data = _dataController1.text.trim();
+                              // print("---data--from----state---before---submit");
+                              // print("${state.url.value}");
+                              // print("${state.header.value}");
+                              // print("${state.body.value}");
+                              // print("${state.method.value}");
+                              // print("------end-----ds");
+                              context.read<ApimanformCubit>().formSummits();
+                              //   .add(SubmittedEvent(
+                              //         url!,
+                              //         hMap,
+                              //         data,
+                              //         ddbValue ?? "get",
+                              //       ));
+                            }
+                          : null,
+                      child: Text("connect"),
+                    ),
+                  )
+                : SizedBox(
+                    width: 70,
+                    child: ElevatedButton(
+                      style: ButtonStyle(
+                          backgroundColor: MaterialStateProperty.all(
+                              Theme.of(context).primaryColor)),
+                      onPressed: () {
+                        setState(() {
+                          isConnected = true;
+                        });
+                      },
+                      child: SizedBox(
+                        height: 13,
+                        width: 13,
+                        child: CircularProgressIndicator(
+                            strokeWidth: 2.0, backgroundColor: Colors.white),
                       ),
                     ),
-        ),
-      ],
-    );
+                  ),
+          ),
+        ],
+      );
+    });
   }
 
   _outPutBox() {
-    print("[start:api_result]...........................");
-    print(result);
-    print("[end:api_result].............................");
-
-    return result != null
-        ? !renderHtml
-            ? Expanded(
-                child: SizedBox(
-                  width: double.infinity,
-                  child: Card(
-                    color: Colors.white70,
-                    shape: RoundedRectangleBorder(
-                      borderRadius:
-                          BorderRadius.circular(4.0), // if you need this
-                      side: BorderSide(
-                        color: Colors.grey.withOpacity(0.2),
-                        width: 1,
-                      ),
+    if (result == null) {
+      return Container(
+        child: Center(
+          child: Text("connect"),
+        ),
+      );
+    } else {
+      return !renderHtml
+          ? Expanded(
+              child: SizedBox(
+                width: double.infinity,
+                child: Card(
+                  color: Colors.white70,
+                  shape: RoundedRectangleBorder(
+                    borderRadius:
+                        BorderRadius.circular(4.0), // if you need this
+                    side: BorderSide(
+                      color: Colors.grey.withOpacity(0.2),
+                      width: 1,
                     ),
-                    child: HighlightView(
-                      !error
-                          ? getPrettyJSONString(result["body"])
-                          : result["error"],
-                      language: lang,
-                      theme: githubTheme,
-                      padding: EdgeInsets.all(12),
-                      textStyle: TextStyle(
-                        fontFamily: 'Consolas',
-                        fontSize: 14,
-                      ),
+                  ),
+                  child: HighlightView(
+                    !error
+                        ? getPrettyJSONString(result["body"])
+                        : result["error"],
+                    language: lang,
+                    theme: githubTheme,
+                    padding: EdgeInsets.all(12),
+                    textStyle: TextStyle(
+                      fontFamily: 'Consolas',
+                      fontSize: 14,
                     ),
                   ),
                 ),
-              )
-            : _buildHtmlRenderer()
-        : Text("connect");
+              ),
+            )
+          : _buildHtmlRenderer(result);
+    }
   }
 
   @override
@@ -344,17 +381,17 @@ class _ApiPagedataState extends State<ApiPagedata>
     super.dispose();
   }
 
-  _buildFab() {
-    return FloatingActionButton(
-      onPressed: () {},
-      child: Icon(
-        Icons.add,
-      ),
-      backgroundColor: Theme.of(context).primaryColor,
-    );
-  }
+  // _buildFab() {
+  //   return FloatingActionButton(
+  //     onPressed: () {},
+  //     child: Icon(
+  //       Icons.add,
+  //     ),
+  //     backgroundColor: Theme.of(context).primaryColor,
+  //   );
+  // }
 
-  _buildHtmlRenderer() {
+  _buildHtmlRenderer(result) {
     var hdata = "";
     if (result["error"] != null) {
       hdata = result["error"];
@@ -397,6 +434,7 @@ class _ApiPagedataState extends State<ApiPagedata>
     ));
   }
 
+//good
   _buildStatusBar() {
     var green = Colors.green;
     var red = Theme.of(context).errorColor;
@@ -452,7 +490,7 @@ class _ApiPagedataState extends State<ApiPagedata>
                   TextButton(
                     onPressed: () {
                       ScaffoldMessenger.of(context).hideCurrentSnackBar();
-                      Future.delayed(Duration(seconds: 1));
+                      // Future.delayed(Duration(seconds: 1));
                       showDialog<void>(
                         context: context,
                         builder: (_) => HeaderDialog(
@@ -474,7 +512,7 @@ class _ApiPagedataState extends State<ApiPagedata>
                         ),
                         onPressed: error
                             ? () {
-                                Future.delayed(Duration(seconds: 1));
+                                // Future.delayed(Duration(seconds: 1));
                                 setState(() {
                                   renderHtml = !renderHtml;
                                 });
@@ -498,6 +536,7 @@ class _ApiPagedataState extends State<ApiPagedata>
                         onPressed: !error
                             ? () {
                                 setState(() {
+                                  _insertDb();
                                   saved = true;
                                 });
                               }
@@ -519,18 +558,60 @@ class _ApiPagedataState extends State<ApiPagedata>
   @override
   bool get wantKeepAlive => true;
 
-  _jsonDecoder(data) {
-    var decodeSucceeded = false;
-    try {
-      var decodedJSON = json.decode(data) as Map<String, dynamic>;
-      decodeSucceeded = true;
-      return decodedJSON;
-      // ignore: unused_catch_clause
-    } on FormatException catch (e) {
-      print('The provided string is not valid JSON');
-    }
-    print('Decoding succeeded: $decodeSucceeded');
+  // _jsonDecoder(data) {
+  //   var decodeSucceeded = false;
+  //   try {
+  //     var decodedJSON = json.decode(data) as Map<String, dynamic>;
+  //     decodeSucceeded = true;
+  //     return decodedJSON;
+  //     // ignore: unused_catch_clause
+  //   } on FormatException catch (e) {
+  //     print('The provided string is not valid JSON');
+  //   }
+  //   print('Decoding succeeded: $decodeSucceeded');
+  // }
+
+  _insertDb() async {
+    print(widget.tabId);
+    print(ddbValue);
+    Map<String, dynamic> row = {
+      DatabaseHelper.columnId: widget.tabId,
+      DatabaseHelper.columnMethod: ddbValue,
+      DatabaseHelper.columnUrl:
+          _pathController1.text.isNotEmpty ? _pathController1.text : "",
+      DatabaseHelper.columnHeaders:
+          _headerController1.text.isNotEmpty ? _headerController1.text : "",
+      DatabaseHelper.columnBody:
+          _dataController1.text.isNotEmpty ? _dataController1.text : "",
+      DatabaseHelper.columnResult: result != null ? json.encode(result) : "",
+      DatabaseHelper.columnTabId: widget.tabId
+    };
+    final id = await dbHelper.insert(row);
+    print('inserted row id:$id');
   }
+
+  _update() async {
+    // print(_pathController1.text);
+    // print(_headerController1.text);
+    // print(_pathController1.text);
+
+    Map<String, dynamic> row = {
+      DatabaseHelper.columnId: widget.tabId,
+      DatabaseHelper.columnMethod: ddbValue,
+      DatabaseHelper.columnUrl:
+          _pathController1.text.isNotEmpty ? _pathController1.text : "",
+      DatabaseHelper.columnHeaders:
+          _headerController1.text.isNotEmpty ? _headerController1.text : "",
+      DatabaseHelper.columnBody:
+          _dataController1.text.isNotEmpty ? _dataController1.text : "",
+      DatabaseHelper.columnResult: result != null ? json.encode(result) : "",
+      DatabaseHelper.columnTabId: widget.tabId
+    };
+    final rowUpdated = dbHelper.update(row);
+    print("updated $rowUpdated row(s)");
+  }
+
+  ///end [Widget]
 }
 
 String getPrettyJSONString(jsonObject) {

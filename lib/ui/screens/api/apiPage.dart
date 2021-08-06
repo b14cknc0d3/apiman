@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:tabbed_view/tabbed_view.dart';
+import 'package:websocket_tester/database/database.dart';
 
 import 'package:websocket_tester/ui/screens/api/apiPageData.dart';
 
@@ -20,15 +21,18 @@ class ApiView extends StatefulWidget {
 int? pageViewIndex;
 
 class _ApiViewState extends State<ApiView> with TickerProviderStateMixin {
-  ActionMenu? actionMenu;
-  int currentPageIndex = 0;
-  int initPosition = 0;
   List<TabData> tabs = [
-    TabData(text: "default", content: ApiPagedata(), closable: false)
+    TabData(
+        text: "default",
+        content: ApiPagedata(
+          tabId: 0,
+        ),
+        closable: false)
   ];
   late TabbedViewController _model;
 
-  int pageCount = 1;
+  // reference to our single class that manages the database
+  final dbHelper = DatabaseHelper.instance;
 
   @override
   void dispose() {
@@ -40,12 +44,13 @@ class _ApiViewState extends State<ApiView> with TickerProviderStateMixin {
     for (int i = 1; i < 3; i++) {
       tabs.add(TabData(
         text: "Tab $i",
-        content: ApiPagedata(),
+        content: ApiPagedata(
+          tabId: i,
+        ),
       ));
     }
 
     _model = TabbedViewController(tabs);
-    // // _tabs = List.generate(tData.length, (index) => ApiPagedata());
 
     super.initState();
   }
@@ -106,7 +111,9 @@ class _ApiViewState extends State<ApiView> with TickerProviderStateMixin {
                 // int millisecond = DateTime.now().millisecondsSinceEpoch;
                 _model.addTab(TabData(
                   text: 'Tab ${tabsCount + 1}',
-                  content: ApiPagedata(),
+                  content: ApiPagedata(
+                    tabId: tabsCount + 1,
+                  ),
                 ));
               }));
           // if (tabsCount > 0) {
@@ -126,5 +133,11 @@ class _ApiViewState extends State<ApiView> with TickerProviderStateMixin {
       padding: const EdgeInsets.all(2.0),
       child: tabbedView,
     ));
+  }
+
+  Future<List<Map<String, dynamic>>> _query() async {
+    final allRows = await dbHelper.queryAllRows();
+    print("Querying ALl Row......");
+    return allRows;
   }
 }

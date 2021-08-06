@@ -27,9 +27,11 @@ dependencies:
   cupertino_icons: ^1.0.2
   draggable_scrollbar: ^0.1.0
   equatable: ^2.0.3
+  flutter_bloc: ^7.1.0
   flutter_highlight: ^0.7.0
   flutter_html: ^2.0.0
   flutter_secure_storage: ^4.2.1
+  formz: ^0.4.0
   google_fonts: ^2.1.0
   http: ^0.13.3
   path_provider: ^2.0.2
@@ -37,6 +39,10 @@ dependencies:
   shared_preferences: ^2.0.6
   sizer: ^2.0.13
   sqflite: ^2.0.0+3
+  sqflite_common_ffi: ^2.0.0+1
+  sqlite3: ^1.1.2
+  sqlite3_library_windows: ^2.1.0
+  string_validator: ^0.3.0
   syntax_highlighter: ^0.1.1
   tabbed_view: ^1.1.1
   web_socket_channel: ^2.1.0
