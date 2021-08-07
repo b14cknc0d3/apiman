@@ -92,6 +92,7 @@ class MyApp extends StatelessWidget {
                 builder: (context, state) {
                   if (state is LangChanging) {
                     return Container(
+                      color: Colors.white,
                       child: Center(
                         child: CircularProgressIndicator(),
                       ),

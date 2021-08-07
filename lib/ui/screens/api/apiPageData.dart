@@ -148,15 +148,23 @@ class _ApiPagedataState extends State<ApiPagedata>
       },
       child: Column(
         children: [
-          Divider(),
-          _buildUrlRow(),
-          Divider(),
-          _headerBox(),
-          Divider(),
-          _dataBox(),
-          Divider(),
-          _buildStatusBar(),
-          _outPutBox()
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                Divider(),
+                _buildUrlRow(),
+                Divider(),
+                _headerBox(),
+                Divider(),
+                _dataBox(),
+                Divider(),
+                _buildStatusBar(),
+                _outPutBox()
+              ],
+            ),
+          ),
         ],
       ),
     );
@@ -347,6 +355,7 @@ class _ApiPagedataState extends State<ApiPagedata>
       return !renderHtml
           ? Expanded(
               child: SizedBox(
+                height: 500,
                 width: double.infinity,
                 child: Card(
                   color: Colors.white70,
