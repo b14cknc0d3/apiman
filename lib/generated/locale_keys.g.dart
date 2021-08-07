@@ -34,5 +34,8 @@ abstract class  LocaleKeys {
   static const body = 'body';
   static const ApiMan = 'ApiMan';
   static const raw = 'raw';
+  static const security = 'security';
+  static const common = 'common';
+  static const misc = 'misc';
 
 }

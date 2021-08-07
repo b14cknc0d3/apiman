@@ -47,7 +47,10 @@ class CodegenLoader extends AssetLoader{
   "submission_success": "submission success!",
   "body": "body",
   "ApiMan": "ApiMan",
-  "raw": "raw"
+  "raw": "raw",
+  "security": "Security",
+  "common": "Common",
+  "misc": "Misc"
 };
 static const Map<String,dynamic> en = {
   "connect": "connect",

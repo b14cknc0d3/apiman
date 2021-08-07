@@ -8,11 +8,13 @@ import 'package:web_socket_channel/io.dart';
 
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:websocket_tester/api_service/apiLoader.dart';
 import 'package:websocket_tester/bloc_observer.dart';
 import 'package:websocket_tester/generated/codegen_loader.g.dart';
 import 'package:websocket_tester/generated/locale_keys.g.dart';
 import 'package:websocket_tester/test_bloc/ws_api_loader.dart';
 import 'package:websocket_tester/ui/screens/api/apiPage.dart';
+import 'package:websocket_tester/ui/screens/api/form_bloc/cubit/apimanform_cubit.dart';
 import 'package:websocket_tester/ui/screens/api/settings/cubit/cubit/lang_cubit.dart';
 import 'package:websocket_tester/ui/screens/api/settings/settings.dart';
 import 'package:websocket_tester/widgets/splash.dart';
@@ -47,6 +49,7 @@ void main() async {
     // Change the default factory
     databaseFactory = databaseFactoryFfi;
   }
+
   runApp(EasyLocalization(
       fallbackLocale: Locale('en', 'US'),
       supportedLocales: [Locale('en', 'US'), Locale('my', "MM")],
@@ -60,6 +63,7 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    ApiLoader apiLoader = ApiLoader();
     const title = 'ApiMan';
     return FutureBuilder(
         future: Future.delayed(Duration(milliseconds: 300)),
@@ -79,6 +83,8 @@ class MyApp extends StatelessWidget {
                 BlocProvider(
                   create: (context) => LangCubit(),
                 ),
+                BlocProvider(
+                    create: (context) => ApimanformCubit(apiLoader: apiLoader))
               ],
               child: BlocBuilder<LangCubit, LangState>(
                 buildWhen: (previousState, currentState) =>

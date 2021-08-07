@@ -73,94 +73,91 @@ class _ApiPagedataState extends State<ApiPagedata>
       lang = "json";
     }
 
-    return BlocProvider(
-      create: (context) => ApimanformCubit(apiLoader: apiLoader),
-      child: BlocListener<ApimanformCubit, ApimanformState>(
-        listener: (context, state) {
-          if (state.status.isSubmissionInProgress) {
-            ScaffoldMessenger.of(context)
-              ..hideCurrentSnackBar()
-              ..showSnackBar(
-                SnackBar(
-                  // backgroundColor:const Theme.of(context).primaryColor,
-                  content: Row(
-                    children: [
-                      Padding(
-                          padding: EdgeInsets.only(left: 8.0, right: 8.0),
-                          child: SizedBox(
-                            height: 12,
-                            width: 12,
-                            child: CircularProgressIndicator(
-                              strokeWidth: 2.0,
-                            ),
-                          )
-                          //  Icon(
-                          //   Icons.sync_rounded,
-                          //   color: Colors.white,
-                          // ),
+    return BlocListener<ApimanformCubit, ApimanformState>(
+      listener: (context, state) {
+        if (state.status.isSubmissionInProgress) {
+          ScaffoldMessenger.of(context)
+            ..hideCurrentSnackBar()
+            ..showSnackBar(
+              SnackBar(
+                // backgroundColor:const Theme.of(context).primaryColor,
+                content: Row(
+                  children: [
+                    Padding(
+                        padding: EdgeInsets.only(left: 8.0, right: 8.0),
+                        child: SizedBox(
+                          height: 12,
+                          width: 12,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2.0,
                           ),
-                      Text('submitting'.tr(), style: TextStyle()),
-                    ],
-                  ),
-                ),
-              );
-          } else if (state.status.isSubmissionFailure) {
-            ScaffoldMessenger.of(context)
-              ..hideCurrentSnackBar()
-              ..showSnackBar(
-                SnackBar(
-                  content: Row(
-                    children: [
-                      Padding(
-                        padding: EdgeInsets.only(left: 8.0, right: 8.0),
-                        child: Icon(
-                          Icons.cancel,
-                          color: Colors.white,
+                        )
+                        //  Icon(
+                        //   Icons.sync_rounded,
+                        //   color: Colors.white,
+                        // ),
                         ),
-                      ),
-                      Text('submission_fail'.tr(), style: TextStyle()),
-                    ],
-                  ),
+                    Text('submitting'.tr(), style: TextStyle()),
+                  ],
                 ),
-              );
-          } else if (state.status.isSubmissionSuccess) {
-            setState(() {
-              result = state.result;
-            });
-            // print(state.result);
-            ScaffoldMessenger.of(context)
-              ..hideCurrentSnackBar()
-              ..showSnackBar(
-                SnackBar(
-                  content: Row(
-                    children: [
-                      Padding(
-                        padding: EdgeInsets.only(left: 8.0, right: 8.0),
-                        child: Icon(
-                          Icons.check_circle,
-                          color: Colors.white,
-                        ),
+              ),
+            );
+        } else if (state.status.isSubmissionFailure) {
+          ScaffoldMessenger.of(context)
+            ..hideCurrentSnackBar()
+            ..showSnackBar(
+              SnackBar(
+                content: Row(
+                  children: [
+                    Padding(
+                      padding: EdgeInsets.only(left: 8.0, right: 8.0),
+                      child: Icon(
+                        Icons.cancel,
+                        color: Colors.white,
                       ),
-                      Text('submission_success'.tr(), style: TextStyle()),
-                    ],
-                  ),
+                    ),
+                    Text('submission_fail'.tr(), style: TextStyle()),
+                  ],
                 ),
-              );
-          }
-        },
-        child: Column(
-          children: [
-            Divider(),
-            _buildUrlRow(),
-            Divider(),
-            _headerBox(),
-            Divider(),
-            _dataBox(),
-            Divider(),
-            _buildStatusBar(),
-            _outPutBox()
-          ],
-        ),
+              ),
+            );
+        } else if (state.status.isSubmissionSuccess) {
+          setState(() {
+            result = state.result;
+          });
+          // print(state.result);
+          ScaffoldMessenger.of(context)
+            ..hideCurrentSnackBar()
+            ..showSnackBar(
+              SnackBar(
+                content: Row(
+                  children: [
+                    Padding(
+                      padding: EdgeInsets.only(left: 8.0, right: 8.0),
+                      child: Icon(
+                        Icons.check_circle,
+                        color: Colors.white,
+                      ),
+                    ),
+                    Text('submission_success'.tr(), style: TextStyle()),
+                  ],
+                ),
+              ),
+            );
+        }
+      },
+      child: Column(
+        children: [
+          Divider(),
+          _buildUrlRow(),
+          Divider(),
+          _headerBox(),
+          Divider(),
+          _dataBox(),
+          Divider(),
+          _buildStatusBar(),
+          _outPutBox()
+        ],
       ),
     );
   }
@@ -173,6 +170,7 @@ class _ApiPagedataState extends State<ApiPagedata>
             padding: EdgeInsets.only(left: 8, right: 8.0, top: 8, bottom: 8),
             child: Form(
               child: TextFormField(
+                maxLines: 3,
                 // initialValue: "{}",
                 onChanged: (value) {
                   context.read<ApimanformCubit>().headerChanged(value);
@@ -204,6 +202,7 @@ class _ApiPagedataState extends State<ApiPagedata>
                     EdgeInsets.only(left: 8, right: 8.0, top: 8, bottom: 8),
                 child: Form(
                   child: TextFormField(
+                    maxLines: 3,
                     // smartQuotesType: SmartQuotesType.enabled,
                     onChanged: (value) {
                       context.read<ApimanformCubit>().bodyChanged(value);
