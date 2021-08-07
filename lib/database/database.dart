@@ -77,6 +77,11 @@ class DatabaseHelper {
     return await db.query(table);
   }
 
+  Future<List<Map<String, dynamic>>> queryAllRowOrderByTabId() async {
+    Database db = await instance.database;
+    return await db.rawQuery('SELECT  * FROM ApiMan ORDER  BY "tabId" ASC ');
+  }
+
   // All of the methods (insert, query, update, delete) can also be done using
   // raw SQL commands. This method uses a raw query to give the row count.
   Future<int?> queryRowCount() async {

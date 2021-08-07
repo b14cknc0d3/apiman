@@ -4,7 +4,7 @@ import 'package:websocket_tester/database/database.dart';
 
 import 'package:websocket_tester/ui/screens/api/apiPageData.dart';
 
-import 'package:websocket_tester/widgets/ActionMenu.dart';
+import 'package:easy_localization/easy_localization.dart';
 
 class ApiPage extends StatelessWidget {
   @override
@@ -22,12 +22,12 @@ int? pageViewIndex;
 
 class _ApiViewState extends State<ApiView> with TickerProviderStateMixin {
   List<TabData> tabs = [
-    TabData(
-        text: "default",
-        content: ApiPagedata(
-          tabId: 0,
-        ),
-        closable: false)
+    // TabData(
+    //     text: "default",
+    //     content: ApiPagedata(
+    //       tabId: 0,
+    //     ),
+    //     closable: false)
   ];
   late TabbedViewController _model;
 
@@ -41,15 +41,35 @@ class _ApiViewState extends State<ApiView> with TickerProviderStateMixin {
 
   @override
   void initState() {
-    for (int i = 1; i < 3; i++) {
-      tabs.add(TabData(
-        text: "Tab $i",
-        content: ApiPagedata(
-          tabId: i,
-        ),
-      ));
+    row() async {
+      final rows = await dbHelper.queryAllRowOrderByTabId();
+
+      print("Querying ALl Row......");
+      // print(allRows);
+      for (int i = 0; i < rows.length; i++) {
+        // var tabID = rows[i]["tabId"];
+        print(i);
+        tabs.add(TabData(
+            text: "api_tab $i",
+            closable: i == 0 ? false : true,
+            content: ApiPagedata(row: rows[i])));
+      }
     }
 
+    row();
+
+    // var rows = (_)async{ return await _query();}
+
+    // for (int i = 1; i < 3; i++) {
+    //   tabs.add(TabData(
+    //     text: "Tab $i",
+    //     content: ApiPagedata(
+    //       tabId: i,
+    //     ),
+    //   ));
+
+    // }
+//
     _model = TabbedViewController(tabs);
 
     super.initState();
@@ -133,7 +153,7 @@ class _ApiViewState extends State<ApiView> with TickerProviderStateMixin {
                 _model.addTab(TabData(
                   text: 'Tab ${tabsCount + 1}',
                   content: ApiPagedata(
-                    tabId: tabsCount + 1,
+                    row: {},
                   ),
                 ));
               }));
@@ -156,9 +176,15 @@ class _ApiViewState extends State<ApiView> with TickerProviderStateMixin {
     ));
   }
 
-  Future<List<Map<String, dynamic>>> _query() async {
-    final allRows = await dbHelper.queryAllRows();
-    print("Querying ALl Row......");
-    return allRows;
-  }
+  // Future<List<Map<String, dynamic>>> _query() async {
+
+  //   // for (var row in allRows) {
+  //   //   print(row);
+  //   // }
+  //   return rows;
+  // }
+
+  // _queryTab() async {
+  //   // final tabList = await dbHelper.
+  // }
 }

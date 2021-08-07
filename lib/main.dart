@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:web_socket_channel/io.dart';
@@ -8,8 +9,11 @@ import 'package:web_socket_channel/io.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:websocket_tester/bloc_observer.dart';
+import 'package:websocket_tester/generated/codegen_loader.g.dart';
+import 'package:websocket_tester/generated/locale_keys.g.dart';
 import 'package:websocket_tester/test_bloc/ws_api_loader.dart';
 import 'package:websocket_tester/ui/screens/api/apiPage.dart';
+import 'package:websocket_tester/ui/screens/api/settings/cubit/cubit/lang_cubit.dart';
 import 'package:websocket_tester/ui/screens/api/settings/settings.dart';
 import 'package:websocket_tester/widgets/splash.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
@@ -19,10 +23,14 @@ import 'dart:ffi';
 import 'package:sqlite3/open.dart';
 import 'package:sqlite3/sqlite3.dart' hide Row;
 import 'package:sqlite3_library_windows/sqlite3_library_windows.dart';
+import 'package:theme_provider/theme_provider.dart';
+import 'package:easy_localization/easy_localization.dart';
 
 // late final Database db;
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await EasyLocalization.ensureInitialized();
+
   Bloc.observer = MyBlocObserver();
   if ((defaultTargetPlatform == TargetPlatform.windows ||
           defaultTargetPlatform == TargetPlatform.linux) &&
@@ -39,7 +47,12 @@ void main() async {
     // Change the default factory
     databaseFactory = databaseFactoryFfi;
   }
-  runApp(const MyApp());
+  runApp(EasyLocalization(
+      fallbackLocale: Locale('en', 'US'),
+      supportedLocales: [Locale('en', 'US'), Locale('my', "MM")],
+      path: 'resources/langs',
+      assetLoader: CodegenLoader(),
+      child: MyApp()));
 }
 
 class MyApp extends StatelessWidget {
@@ -53,30 +66,71 @@ class MyApp extends StatelessWidget {
         builder: (BuildContext context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return MaterialApp(
+              localizationsDelegates: context.localizationDelegates,
+              supportedLocales: context.supportedLocales,
+              locale: context.locale,
               debugShowCheckedModeBanner: false,
               home: Splash(),
-              title: title,
+              title: title.tr(),
             );
           } else {
-            return MaterialApp(
-              debugShowCheckedModeBanner: false,
-              title: title,
-              home: MyHomePage(
-                title: title,
-              ),
-              theme: ThemeData(
-                buttonTheme: ButtonThemeData(
-                  highlightColor: Theme.of(context).primaryColor,
+            return MultiBlocProvider(
+              providers: [
+                BlocProvider(
+                  create: (context) => LangCubit(),
                 ),
-                primaryColor: Color(0xFF33691e),
-                primaryColorLight: Color(0xff629749),
-                primaryColorDark: Color(0xff003d00),
-                snackBarTheme: SnackBarThemeData(
-                  contentTextStyle: TextStyle(color: Colors.white),
-                  backgroundColor: Color(0xFF33691e),
-                ),
+              ],
+              child: BlocBuilder<LangCubit, LangState>(
+                buildWhen: (previousState, currentState) =>
+                    previousState != currentState,
+                builder: (context, state) {
+                  if (state is LangChanging) {
+                    return Container(
+                      child: Center(
+                        child: CircularProgressIndicator(),
+                      ),
+                    );
+                  } // print(state.locale);
+                  return ThemeProvider(
+                    themes: [
+                      AppTheme(
+                        id: "theme_green",
+                        description: "Green Theme",
+                        data: ThemeData(
+                          buttonTheme: ButtonThemeData(
+                            highlightColor: Theme.of(context).primaryColor,
+                          ),
+                          primaryColor: Color(0xFF33691e),
+                          primaryColorLight: Color(0xff629749),
+                          primaryColorDark: Color(0xff003d00),
+                          snackBarTheme: SnackBarThemeData(
+                            contentTextStyle: TextStyle(color: Colors.white),
+                            backgroundColor: Color(0xFF33691e),
+                          ),
+                        ),
+                      ),
+                      AppTheme.light(),
+                      AppTheme.dark(),
+                    ],
+                    child: ThemeConsumer(
+                      child: Builder(
+                        builder: (themeContext) => MaterialApp(
+                          localizationsDelegates: context.localizationDelegates,
+                          supportedLocales: context.supportedLocales,
+                          locale: context.locale,
+                          debugShowCheckedModeBanner: false,
+                          title: title.tr(),
+                          home: MyHomePage(
+                            title: title,
+                          ),
+                          theme: ThemeProvider.themeOf(themeContext).data,
+                          // color: Color(0xff33691e),
+                        ),
+                      ),
+                    ),
+                  );
+                },
               ),
-              // color: Color(0xff33691e),
             );
           }
         });
@@ -113,9 +167,9 @@ class _MyHomePageState extends State<MyHomePage> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        backgroundColor: Color(0xFF33691e),
+        backgroundColor: Theme.of(context).primaryColor,
         title: Text(
-          widget.title,
+          widget.title.tr(),
           style: GoogleFonts.righteous(
             fontWeight: FontWeight.bold,
           ),
@@ -193,7 +247,7 @@ class _MyHomePageState extends State<MyHomePage> {
                             borderRadius:
                                 BorderRadius.all(Radius.circular(4.0)),
                           ),
-                          labelText: 'enter path'),
+                          labelText: 'enter_path'.tr()),
                     )),
                   ),
                 ),
@@ -202,9 +256,17 @@ class _MyHomePageState extends State<MyHomePage> {
                   ? SizedBox(
                       width: 70,
                       child: ElevatedButton(
-                        style: ButtonStyle(
-                            backgroundColor: MaterialStateProperty.all(
-                                Theme.of(context).primaryColor)),
+                        style: ButtonStyle(backgroundColor:
+                            MaterialStateProperty.resolveWith<Color>(
+                                (Set<MaterialState> states) {
+                          if (states.contains(MaterialState.pressed))
+                            return Theme.of(context)
+                                .primaryColor
+                                .withOpacity(1);
+                          else if (states.contains(MaterialState.disabled))
+                            return Colors.black26;
+                          return Theme.of(context).primaryColor; //
+                        })),
                         onPressed: () {
                           setState(() {
                             _channel =
@@ -212,15 +274,23 @@ class _MyHomePageState extends State<MyHomePage> {
                             isConnected = true;
                           });
                         },
-                        child: Text("connect"),
+                        child: Text(LocaleKeys.connect).tr(),
                       ),
                     )
                   : SizedBox(
                       width: 70,
                       child: ElevatedButton(
-                        style: ButtonStyle(
-                            backgroundColor: MaterialStateProperty.all(
-                                Theme.of(context).primaryColor)),
+                        style: ButtonStyle(backgroundColor:
+                            MaterialStateProperty.resolveWith<Color>(
+                                (Set<MaterialState> states) {
+                          if (states.contains(MaterialState.pressed))
+                            return Theme.of(context)
+                                .primaryColor
+                                .withOpacity(1);
+                          else if (states.contains(MaterialState.disabled))
+                            return Colors.black26;
+                          return Theme.of(context).primaryColor; //
+                        })),
                         onPressed: () {
                           setState(() {
                             _channel?.sink.close();
@@ -228,7 +298,8 @@ class _MyHomePageState extends State<MyHomePage> {
                           });
                         },
                         child: Text(
-                          "Cancle",
+                          "",
+                          // LocaleKeys.cancle,
                           softWrap: true,
                         ),
                       ),
@@ -276,12 +347,12 @@ class _MyHomePageState extends State<MyHomePage> {
                     child: Form(
                       child: TextFormField(
                         controller: _controller,
-                        decoration: const InputDecoration(
+                        decoration: InputDecoration(
                             border: OutlineInputBorder(
                               borderRadius:
                                   BorderRadius.all(Radius.circular(4.0)),
                             ),
-                            labelText: 'Send a message'),
+                            labelText: "send_message_ws".tr()),
                       ),
                     ),
                   ),
@@ -290,13 +361,19 @@ class _MyHomePageState extends State<MyHomePage> {
               SizedBox(
                 width: 70,
                 child: ElevatedButton(
-                  style: ButtonStyle(
-                      backgroundColor: MaterialStateProperty.all(
-                          Theme.of(context).primaryColor)),
+                  style: ButtonStyle(backgroundColor:
+                      MaterialStateProperty.resolveWith<Color>(
+                          (Set<MaterialState> states) {
+                    if (states.contains(MaterialState.pressed))
+                      return Theme.of(context).primaryColor.withOpacity(1);
+                    else if (states.contains(MaterialState.disabled))
+                      return Colors.black26;
+                    return Theme.of(context).primaryColor; //
+                  })),
                   onPressed: () {
                     _sendMessage();
                   },
-                  child: Text("Send"),
+                  child: Text(LocaleKeys.send).tr(),
                 ),
               ),
             ],
@@ -327,7 +404,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     );
                   },
                 )
-              : Center(child: Text("Connect to socket")),
+              : Center(child: Text(LocaleKeys.connect_to_socket).tr()),
         ],
       ),
     );
@@ -342,10 +419,10 @@ class _MyHomePageState extends State<MyHomePage> {
                   icon: Icon(Icons.web), label: 'websocket'),
               BottomNavigationBarItem(icon: Icon(Icons.public), label: 'api'),
               BottomNavigationBarItem(
-                  icon: Icon(Icons.settings), label: 'settings'),
+                  icon: Icon(Icons.settings), label: 'settings'.tr()),
             ],
             onTap: _onTappedBar,
-            selectedItemColor: Color(0xff629749),
+            selectedItemColor: Theme.of(context).primaryColorLight,
             currentIndex: _selectedIndex,
           )
         : BottomAppBar(
@@ -399,20 +476,3 @@ class _MyHomePageState extends State<MyHomePage> {
     // _pageController.jumpToPage(value);
   }
 }
-
-class SettingView extends StatelessWidget {
-  const SettingView({Key? key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Container();
-  }
-}
-
-// DynamicLibrary _openSqliteUnderWindows() {
-//   final scriptDir = File(Platform.script.toFilePath()).parent;
-//   // ignore: non_constant_identifier_names
-//   print("${scriptDir.path}");
-//   final LibraryNextoScript = File('${scriptDir.path}/sqlite3.dll');
-//   return DynamicLibrary.open(LibraryNextoScript.path);
-// }

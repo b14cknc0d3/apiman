@@ -11,12 +11,13 @@ import 'package:websocket_tester/utils/highlight.dart';
 import 'package:flutter_html/flutter_html.dart';
 import 'package:websocket_tester/widgets/dialogButton.dart';
 import 'package:formz/formz.dart';
+import 'package:easy_localization/easy_localization.dart';
 
 class ApiPagedata extends StatefulWidget {
   // final String pageNum;
 
-  final int tabId;
-  const ApiPagedata({Key? key, required this.tabId}) : super(key: key);
+  final Map row;
+  const ApiPagedata({Key? key, required this.row}) : super(key: key);
 
   @override
   _ApiPagedataState createState() => _ApiPagedataState();
@@ -24,12 +25,9 @@ class ApiPagedata extends StatefulWidget {
 
 class _ApiPagedataState extends State<ApiPagedata>
     with AutomaticKeepAliveClientMixin<ApiPagedata> {
-  final TextEditingController _pathController1 =
-      TextEditingController(text: "http");
-  final TextEditingController _headerController1 =
-      TextEditingController(text: "{}");
-  final TextEditingController _dataController1 =
-      TextEditingController(text: "{}");
+  final TextEditingController _pathController1 = TextEditingController();
+  final TextEditingController _headerController1 = TextEditingController();
+  final TextEditingController _dataController1 = TextEditingController();
 
   int? pageIdx;
   final dbHelper = DatabaseHelper.instance;
@@ -48,6 +46,18 @@ class _ApiPagedataState extends State<ApiPagedata>
 
   @override
   void initState() {
+    setState(() {
+      _pathController1.text =
+          widget.row.isNotEmpty ? widget.row["url"] : "http";
+      _headerController1.text =
+          widget.row.isNotEmpty ? widget.row["headers"] : "{}";
+      _dataController1.text = widget.row.isNotEmpty ? widget.row["body"] : "{}";
+
+      if (widget.row.isNotEmpty) {
+        ddbValue = widget.row["method"];
+        result = json.decode(widget.row["result"]);
+      }
+    });
     super.initState();
   }
 
@@ -89,7 +99,7 @@ class _ApiPagedataState extends State<ApiPagedata>
                           //   color: Colors.white,
                           // ),
                           ),
-                      Text('submitting...', style: TextStyle()),
+                      Text('submitting'.tr(), style: TextStyle()),
                     ],
                   ),
                 ),
@@ -108,7 +118,7 @@ class _ApiPagedataState extends State<ApiPagedata>
                           color: Colors.white,
                         ),
                       ),
-                      Text('submission failed!...', style: TextStyle()),
+                      Text('submission_fail'.tr(), style: TextStyle()),
                     ],
                   ),
                 ),
@@ -131,7 +141,7 @@ class _ApiPagedataState extends State<ApiPagedata>
                           color: Colors.white,
                         ),
                       ),
-                      Text('submission success!...', style: TextStyle()),
+                      Text('submission_success'.tr(), style: TextStyle()),
                     ],
                   ),
                 ),
@@ -206,7 +216,7 @@ class _ApiPagedataState extends State<ApiPagedata>
                         //   borderRadius:
                         //       BorderRadius.all(Radius.circular(4.0)),
                         // ),
-                        labelText: 'body'),
+                        labelText: 'body'.tr()),
                   ),
                 ),
               ),
@@ -247,13 +257,6 @@ class _ApiPagedataState extends State<ApiPagedata>
                 context
                     .read<ApimanformCubit>()
                     .methodChanged(ddbValue ?? "get");
-
-                // TODO :delete-------//
-                // setState(() {
-                //   print(ddbValue);
-                //   ddbValue = value;
-                // });
-                //--------------------//
               },
             ),
           ),
@@ -273,7 +276,7 @@ class _ApiPagedataState extends State<ApiPagedata>
                     //   borderRadius:
                     //       BorderRadius.all(Radius.circular(4.0)),
                     // ),
-                    labelText: 'enter url'),
+                    labelText: 'enter_path'.tr()),
               )),
             ),
           ),
@@ -298,7 +301,7 @@ class _ApiPagedataState extends State<ApiPagedata>
                             }
                           : null,
                       child: Text(
-                        "connect",
+                        "connect".tr(),
                         style: TextStyle(),
                       ),
                     ),
@@ -306,9 +309,15 @@ class _ApiPagedataState extends State<ApiPagedata>
                 : SizedBox(
                     width: 70,
                     child: ElevatedButton(
-                      style: ButtonStyle(
-                          backgroundColor: MaterialStateProperty.all(
-                              Theme.of(context).primaryColor)),
+                      style: ButtonStyle(backgroundColor:
+                          MaterialStateProperty.resolveWith<Color>(
+                              (Set<MaterialState> states) {
+                        if (states.contains(MaterialState.pressed))
+                          return Theme.of(context).primaryColor.withOpacity(1);
+                        else if (states.contains(MaterialState.disabled))
+                          return Colors.black26;
+                        return Theme.of(context).primaryColor; //
+                      })),
                       onPressed: () {
                         setState(() {
                           isConnected = true;
@@ -332,7 +341,7 @@ class _ApiPagedataState extends State<ApiPagedata>
     if (result == null) {
       return Container(
         child: Center(
-          child: Text("connect"),
+          child: Text("connect".tr()),
         ),
       );
     } else {
@@ -461,7 +470,8 @@ class _ApiPagedataState extends State<ApiPagedata>
                         Icons.language,
                         color: scolor,
                       ),
-                      label: Text("status: ${result['status_code']}",
+                      label: Text(
+                          "status".tr(args: [": ${result['status_code']}"]),
                           style: TextStyle(
                             color: scolor,
                           )),
@@ -471,14 +481,14 @@ class _ApiPagedataState extends State<ApiPagedata>
                   Padding(
                     padding: const EdgeInsets.only(left: 8.0),
                     child: Text(
-                      "content_length: ",
+                      "content_length".tr(),
                       style: TextStyle(),
                     ),
                   ),
                   Padding(
                     padding: const EdgeInsets.only(right: 8.0),
                     child: Text(
-                      " ${result["length"]}",
+                      ": ${result["length"]}",
                       style: TextStyle(fontWeight: FontWeight.bold),
                     ),
                   ),
@@ -505,10 +515,17 @@ class _ApiPagedataState extends State<ApiPagedata>
                   Padding(
                       padding: EdgeInsets.only(left: 50),
                       child: ElevatedButton(
-                        style: ButtonStyle(
-                          backgroundColor: MaterialStateProperty.all(
-                              Theme.of(context).primaryColor),
-                        ),
+                        style: ButtonStyle(backgroundColor:
+                            MaterialStateProperty.resolveWith<Color>(
+                                (Set<MaterialState> states) {
+                          if (states.contains(MaterialState.pressed))
+                            return Theme.of(context)
+                                .primaryColor
+                                .withOpacity(1);
+                          else if (states.contains(MaterialState.disabled))
+                            return Colors.black26;
+                          return Theme.of(context).primaryColor; //
+                        })),
                         onPressed: error
                             ? () {
                                 // Future.delayed(Duration(seconds: 1));
@@ -518,7 +535,7 @@ class _ApiPagedataState extends State<ApiPagedata>
                               }
                             : null,
                         child: Text(
-                          renderHtml ? "raw" : "render",
+                          renderHtml ? "raw".tr() : "render".tr(),
                           style: TextStyle(
                             color: Colors.white,
                           ),
@@ -528,10 +545,17 @@ class _ApiPagedataState extends State<ApiPagedata>
                       padding: EdgeInsets.only(left: 5),
                       child: ElevatedButton.icon(
                         icon: Icon(Icons.save_rounded, color: Colors.white),
-                        style: ButtonStyle(
-                          backgroundColor: MaterialStateProperty.all(
-                              Theme.of(context).primaryColor),
-                        ),
+                        style: ButtonStyle(backgroundColor:
+                            MaterialStateProperty.resolveWith<Color>(
+                                (Set<MaterialState> states) {
+                          if (states.contains(MaterialState.pressed))
+                            return Theme.of(context)
+                                .primaryColor
+                                .withOpacity(1);
+                          else if (states.contains(MaterialState.disabled))
+                            return Colors.black26;
+                          return Theme.of(context).primaryColor; //
+                        })),
                         onPressed: !error
                             ? () {
                                 setState(() {
@@ -541,7 +565,7 @@ class _ApiPagedataState extends State<ApiPagedata>
                               }
                             : null,
                         label: Text(
-                          saved ? "saved" : "save",
+                          saved ? "saved".tr() : "save".tr(),
                           style: TextStyle(
                             color: Colors.white,
                           ),
@@ -557,24 +581,11 @@ class _ApiPagedataState extends State<ApiPagedata>
   @override
   bool get wantKeepAlive => true;
 
-  // _jsonDecoder(data) {
-  //   var decodeSucceeded = false;
-  //   try {
-  //     var decodedJSON = json.decode(data) as Map<String, dynamic>;
-  //     decodeSucceeded = true;
-  //     return decodedJSON;
-  //     // ignore: unused_catch_clause
-  //   } on FormatException catch (e) {
-  //     print('The provided string is not valid JSON');
-  //   }
-  //   print('Decoding succeeded: $decodeSucceeded');
-  // }
-
   _insertDb() async {
-    print(widget.tabId);
+    // print(widget.tabId);
     print(ddbValue);
     Map<String, dynamic> row = {
-      DatabaseHelper.columnId: widget.tabId,
+      DatabaseHelper.columnId: widget.row.isNotEmpty ? widget.row["tabId"] : 1,
       DatabaseHelper.columnMethod: ddbValue,
       DatabaseHelper.columnUrl:
           _pathController1.text.isNotEmpty ? _pathController1.text : "",
@@ -583,7 +594,8 @@ class _ApiPagedataState extends State<ApiPagedata>
       DatabaseHelper.columnBody:
           _dataController1.text.isNotEmpty ? _dataController1.text : "",
       DatabaseHelper.columnResult: result != null ? json.encode(result) : "",
-      DatabaseHelper.columnTabId: widget.tabId
+      DatabaseHelper.columnTabId:
+          widget.row.isNotEmpty ? widget.row["tabId"] : 1
     };
     final id = await dbHelper.insert(row);
     print('inserted row id:$id');
@@ -595,7 +607,7 @@ class _ApiPagedataState extends State<ApiPagedata>
     // print(_pathController1.text);
 
     Map<String, dynamic> row = {
-      DatabaseHelper.columnId: widget.tabId,
+      DatabaseHelper.columnId: widget.row["tabId"],
       DatabaseHelper.columnMethod: ddbValue,
       DatabaseHelper.columnUrl:
           _pathController1.text.isNotEmpty ? _pathController1.text : "",
@@ -604,7 +616,8 @@ class _ApiPagedataState extends State<ApiPagedata>
       DatabaseHelper.columnBody:
           _dataController1.text.isNotEmpty ? _dataController1.text : "",
       DatabaseHelper.columnResult: result != null ? json.encode(result) : "",
-      DatabaseHelper.columnTabId: widget.tabId
+      DatabaseHelper.columnTabId:
+          widget.row.isNotEmpty ? widget.row["tabId"] : 1
     };
     final rowUpdated = dbHelper.update(row);
     print("updated $rowUpdated row(s)");

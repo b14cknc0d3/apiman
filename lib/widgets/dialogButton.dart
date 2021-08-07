@@ -28,21 +28,40 @@ class HeaderDialog extends StatelessWidget {
                     var value = headers.values.elementAt(idx);
                     return Row(
                       children: [
-                        Container(
-                          width: 150,
-                          decoration: BoxDecoration(
-                            border: Border(
-                              bottom: BorderSide(
-                                color: Theme.of(context).primaryColor,
-                                width: 1,
+                        Expanded(
+                          child: Container(
+                            width: 150,
+                            height: 20,
+                            decoration: BoxDecoration(
+                              border: Border(
+                                bottom: BorderSide(
+                                  color: Theme.of(context).primaryColor,
+                                  width: 1,
+                                ),
+                              ),
+                            ),
+                            child: SingleChildScrollView(
+                              scrollDirection: Axis.horizontal,
+                              child: Row(
+                                children: [
+                                  Text("$key"),
+                                ],
                               ),
                             ),
                           ),
-                          child: Text("$key"),
                         ),
-                        Spacer(),
+                        // Spacer(),
+                        // Container(
+                        //   color: Colors.black,
+                        //   child: VerticalDivider(
+                        //     // width: 2,
+                        //     color: Colors.black,
+                        //   ),
+                        // ),
+                        Container(child: Text("|")),
                         Container(
                           width: 150,
+                          height: 20,
                           decoration: BoxDecoration(
                             border: Border(
                               bottom: BorderSide(
@@ -52,9 +71,16 @@ class HeaderDialog extends StatelessWidget {
                             ),
                           ),
                           alignment: Alignment.centerLeft,
-                          child: Text(
-                            "| $value",
-                            textAlign: TextAlign.left,
+                          child: SingleChildScrollView(
+                            scrollDirection: Axis.horizontal,
+                            child: Row(
+                              children: [
+                                Text(
+                                  " $value",
+                                  textAlign: TextAlign.left,
+                                ),
+                              ],
+                            ),
                           ),
                         ),
                       ],

@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
-// import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:google_fonts/google_fonts.dart';
+
 import 'package:settings_ui/settings_ui.dart';
+import 'package:theme_provider/theme_provider.dart';
 import 'package:websocket_tester/ui/screens/api/settings/language_screen.dart';
+import 'package:easy_localization/easy_localization.dart';
 
 class SettingsScreen extends StatefulWidget {
   @override
@@ -21,51 +22,60 @@ class _SettingsScreenState extends State<SettingsScreen> {
   }
 
   Widget buildSettingsList() {
+    var lang = EasyLocalization.of(context)!.currentLocale;
+    // var lang =EasyLocalization.of(context).currentLocale;
+
+    List keys = EasyLocalization.of(context)!.supportedLocales;
+    var languageIndex = keys.indexOf(lang);
+    var controller = ThemeProvider.controllerOf(context);
+
     return SettingsList(
       sections: [
         SettingsSection(
-          title: "User",
+          title: "user".tr(),
           tiles: [
             SettingsTile(
-                title: "profile",
+                title: "profile".tr(),
                 subtitle: "view",
                 leading: Icon(Icons.account_circle))
           ],
         ),
         SettingsSection(
-          title: 'Common',
+          title: 'common'.tr(),
           tiles: [
             SettingsTile(
-              title: 'Language',
-              subtitle: 'English',
+              title: 'language'.tr(),
+              subtitle: '${lang.toString()}',
               leading: Icon(Icons.language),
               onPressed: (context) {
                 Navigator.of(context).push(MaterialPageRoute(
-                  builder: (_) => LanguagesScreen(),
+                  builder: (_) => LanguagesScreen(idx: languageIndex),
                 ));
               },
             ),
             SettingsTile(
-              title: 'Environment',
+              title: 'environment'.tr(),
               subtitle: 'Production',
               leading: Icon(Icons.cloud_queue),
             ),
           ],
         ),
         SettingsSection(
-          title: 'Theme',
+          title: 'theme'.tr(),
           tiles: [
             // SettingsTile(title: 'Phone number', leading: Icon(Icons.phone)),
             // SettingsTile(title: 'Email', leading: Icon(Icons.email)),
             SettingsTile(
-              title: 'change theme',
+              title: 'change_theme'.tr(),
               leading: Icon(Icons.wb_sunny),
-              onPressed: (_) {},
+              onPressed: (_) {
+                controller.nextTheme();
+              },
             ),
           ],
         ),
         SettingsSection(
-          title: 'Security',
+          title: 'security'.tr(),
           tiles: [
             SettingsTile.switchTile(
               switchActiveColor: Theme.of(context).primaryColor,
@@ -126,7 +136,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 ),
               ),
               Text(
-                'Version: 0.0.1.alpha',
+                'Version'.tr(args: [": 0.0.1.alpha"]),
                 style: TextStyle(color: Color(0xFF777777)),
               ),
             ],
