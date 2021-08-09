@@ -10,6 +10,7 @@
     "content_length": "content_length",
     "api": "api",
     "settings": "settings",
+    "theme": "Theme",
     "change_theme": "change theme",
     "language": "Language",
     "Version": "Version {}",

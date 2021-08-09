@@ -27,6 +27,7 @@ import 'package:sqlite3/sqlite3.dart' hide Row;
 import 'package:sqlite3_library_windows/sqlite3_library_windows.dart';
 import 'package:theme_provider/theme_provider.dart';
 import 'package:easy_localization/easy_localization.dart';
+import 'package:audioplayers/audioplayers.dart';
 
 // late final Database db;
 void main() async {
@@ -157,6 +158,7 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+  late final AudioCache _audioCache;
   List messages = [];
   final TextEditingController _controller = TextEditingController();
 
@@ -169,6 +171,16 @@ class _MyHomePageState extends State<MyHomePage> {
   var headers;
   bool isConnected = false;
   String error = "";
+  @override
+  void initState() {
+    _audioCache = AudioCache(
+      prefix: 'audio/',
+      fixedPlayer: AudioPlayer()..setReleaseMode(ReleaseMode.STOP),
+    );
+    // TODO: implement initState
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -449,6 +461,7 @@ class _MyHomePageState extends State<MyHomePage> {
                         color: Theme.of(context).primaryColorLight,
                       ),
                       onPressed: () {
+                        _audioCache.play('my_audio.mp3');
                         _onTappedBar(0);
                       }),
                   // Spacer(),
@@ -459,6 +472,7 @@ class _MyHomePageState extends State<MyHomePage> {
                         color: Theme.of(context).primaryColorLight,
                       ),
                       onPressed: () {
+                        _audioCache.play('my_audio.mp3');
                         _onTappedBar(1);
                       }),
                   IconButton(
@@ -468,6 +482,7 @@ class _MyHomePageState extends State<MyHomePage> {
                         color: Theme.of(context).primaryColorLight,
                       ),
                       onPressed: () {
+                        _audioCache.play('my_audio.mp3');
                         _onTappedBar(2);
                       }),
                 ],
