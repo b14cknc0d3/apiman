@@ -2,16 +2,17 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_highlight/themes/github.dart';
+
+import 'package:flutter_highlight/themes/solarized-light.dart';
 import 'package:websocket_tester/api_service/apiLoader.dart';
 import 'package:websocket_tester/database/database.dart';
-// import 'package:websocket_tester/ui/screens/api/form_bloc/bloc/apimanform_bloc.dart';
 import 'package:websocket_tester/ui/screens/api/form_bloc/cubit/apimanform_cubit.dart';
 import 'package:websocket_tester/utils/highlight.dart';
 import 'package:flutter_html/flutter_html.dart';
 import 'package:websocket_tester/widgets/dialogButton.dart';
 import 'package:formz/formz.dart';
 import 'package:easy_localization/easy_localization.dart';
+import 'package:sizer/sizer.dart';
 
 class ApiPagedata extends StatefulWidget {
   // final String pageNum;
@@ -63,6 +64,10 @@ class _ApiPagedataState extends State<ApiPagedata>
 
   @override
   Widget build(BuildContext context) {
+    String fail = 'submission_fail'.tr();
+    String success = 'submission_success'.tr();
+    String submitting = 'submitting'.tr();
+
     super.build(context);
     if (result != null) {
       error = result.containsKey("error");
@@ -91,13 +96,8 @@ class _ApiPagedataState extends State<ApiPagedata>
                           child: CircularProgressIndicator(
                             strokeWidth: 2.0,
                           ),
-                        )
-                        //  Icon(
-                        //   Icons.sync_rounded,
-                        //   color: Colors.white,
-                        // ),
-                        ),
-                    Text('submitting'.tr(), style: TextStyle()),
+                        )),
+                    Text(submitting, style: TextStyle()),
                   ],
                 ),
               ),
@@ -116,7 +116,7 @@ class _ApiPagedataState extends State<ApiPagedata>
                         color: Colors.white,
                       ),
                     ),
-                    Text('submission_fail'.tr(), style: TextStyle()),
+                    Text(fail, style: TextStyle()),
                   ],
                 ),
               ),
@@ -139,33 +139,30 @@ class _ApiPagedataState extends State<ApiPagedata>
                         color: Colors.white,
                       ),
                     ),
-                    Text('submission_success'.tr(), style: TextStyle()),
+                    Text(success, style: TextStyle()),
                   ],
                 ),
               ),
             );
         }
       },
-      child: Column(
-        children: [
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: [
-                Divider(),
-                _buildUrlRow(),
-                Divider(),
-                _headerBox(),
-                Divider(),
-                _dataBox(),
-                Divider(),
-                _buildStatusBar(),
-                _outPutBox()
-              ],
-            ),
-          ),
-        ],
+      child: SingleChildScrollView(
+        child: Column(
+          mainAxisSize: MainAxisSize.max,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          children: [
+            Divider(),
+            _buildUrlRow(),
+            Divider(),
+            _headerBox(),
+            Divider(),
+            _dataBox(),
+            Divider(),
+            _buildStatusBar(),
+            _outPutBox()
+          ],
+        ),
       ),
     );
   }
@@ -236,112 +233,128 @@ class _ApiPagedataState extends State<ApiPagedata>
 
   _buildUrlRow() {
     return BlocBuilder<ApimanformCubit, ApimanformState>(
-        builder: (context, state) {
-      return Row(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        crossAxisAlignment: CrossAxisAlignment.end,
-        children: [
-          Padding(
-            padding: const EdgeInsets.only(left: 8.0),
-            child: DropdownButton<String>(
-              focusNode: FocusNode(),
-              // style: TextStyle(backgroundColor: Theme.of(context).primaryColor),
-              focusColor: Theme.of(context).primaryColor,
-              // dropdownColor: Theme.of(context).primaryColor,
-              iconEnabledColor: Theme.of(context).primaryColor,
-              value: ddbValue,
-              items: <String>["get", "post", "put", "patch", "head", "options"]
-                  .map((String value) {
-                return DropdownMenuItem(
-                  child: Text(value),
-                  value: value,
-                );
-              }).toList(),
-              onChanged: (value) {
-                setState(() {
-                  ddbValue = value;
-                });
-                context
-                    .read<ApimanformCubit>()
-                    .methodChanged(ddbValue ?? "get");
-              },
-            ),
-          ),
-          Expanded(
-            child: Padding(
-              padding:
-                  EdgeInsets.only(left: 30, right: 30.0, top: 8, bottom: 8),
-              child: Form(
-                  child: TextFormField(
+      builder: (context, state) {
+        return Row(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          crossAxisAlignment: CrossAxisAlignment.end,
+          children: [
+            Padding(
+              padding: const EdgeInsets.only(left: 8.0),
+              child: DropdownButton<String>(
+                focusNode: FocusNode(),
+                // style: TextStyle(backgroundColor: Theme.of(context).primaryColor),
+                focusColor: Theme.of(context).primaryColor,
+                // dropdownColor: Theme.of(context).primaryColor,
+                iconEnabledColor: Theme.of(context).primaryColor,
+                value: ddbValue,
+                items: <String>[
+                  "get",
+                  "post",
+                  "put",
+                  "patch",
+                  "head",
+                  "options"
+                ].map((String value) {
+                  return DropdownMenuItem(
+                    child: Text(value),
+                    value: value,
+                  );
+                }).toList(),
                 onChanged: (value) {
-                  context.read<ApimanformCubit>().urlChanged(value);
+                  setState(() {
+                    ddbValue = value;
+                  });
+                  context
+                      .read<ApimanformCubit>()
+                      .methodChanged(ddbValue ?? "get");
                 },
-                controller: _pathController1,
-                decoration: InputDecoration(
-                    border: UnderlineInputBorder(),
-                    // border: OutlineInputBorder(
-                    //   borderRadius:
-                    //       BorderRadius.all(Radius.circular(4.0)),
-                    // ),
-                    labelText: 'enter_path'.tr()),
-              )),
+              ),
             ),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: !state.status.isSubmissionInProgress
-                ? SizedBox(
-                    width: 70,
-                    child: ElevatedButton(
-                      style: ButtonStyle(backgroundColor:
-                          MaterialStateProperty.resolveWith<Color>(
-                              (Set<MaterialState> states) {
-                        if (states.contains(MaterialState.pressed))
-                          return Theme.of(context).primaryColor.withOpacity(1);
-                        else if (states.contains(MaterialState.disabled))
-                          return Colors.black26;
-                        return Theme.of(context).primaryColor; //
-                      })),
-                      onPressed: state.status.isValidated
-                          ? () {
-                              context.read<ApimanformCubit>().formSummits();
-                            }
-                          : null,
-                      child: Text(
-                        "connect".tr(),
-                        style: TextStyle(),
+            Expanded(
+              child: Padding(
+                padding:
+                    EdgeInsets.only(left: 30, right: 30.0, top: 8, bottom: 8),
+                child: Form(
+                    child: TextFormField(
+                  onChanged: (value) {
+                    context.read<ApimanformCubit>().urlChanged(value);
+                  },
+                  controller: _pathController1,
+                  decoration: InputDecoration(
+                      border: UnderlineInputBorder(),
+                      // border: OutlineInputBorder(
+                      //   borderRadius:
+                      //       BorderRadius.all(Radius.circular(4.0)),
+                      // ),
+                      labelText: 'enter_path'.tr()),
+                )),
+              ),
+            ),
+            Padding(
+              padding: EdgeInsets.only(
+                top: 1.h,
+                bottom: 1.h,
+                left: 1.w,
+                right: 1.w,
+              ),
+              child: !state.status.isSubmissionInProgress
+                  ? SizedBox(
+                      width: 15.w,
+                      child: ElevatedButton(
+                        style: ButtonStyle(backgroundColor:
+                            MaterialStateProperty.resolveWith<Color>(
+                                (Set<MaterialState> states) {
+                          if (states.contains(MaterialState.pressed))
+                            return Theme.of(context)
+                                .primaryColor
+                                .withOpacity(1);
+                          else if (states.contains(MaterialState.disabled))
+                            return Colors.black26;
+                          return Theme.of(context).primaryColor; //
+                        })),
+                        onPressed: state.status.isValidated
+                            ? () {
+                                context.read<ApimanformCubit>().formSummits();
+                              }
+                            : null,
+                        child: Text(
+                          "connect".tr(),
+                          style: TextStyle(),
+                        ),
+                      ),
+                    )
+                  : SizedBox(
+                      width: 15.w,
+                      child: ElevatedButton(
+                        style: ButtonStyle(backgroundColor:
+                            MaterialStateProperty.resolveWith<Color>(
+                                (Set<MaterialState> states) {
+                          if (states.contains(MaterialState.pressed))
+                            return Theme.of(context)
+                                .primaryColor
+                                .withOpacity(1);
+                          else if (states.contains(MaterialState.disabled))
+                            return Colors.black26;
+                          return Theme.of(context).primaryColor; //
+                        })),
+                        onPressed: () {
+                          setState(() {
+                            isConnected = true;
+                          });
+                        },
+                        child: SizedBox(
+                          height: 13,
+                          width: 13,
+                          child: CircularProgressIndicator(
+                              strokeWidth: 2.0, backgroundColor: Colors.white),
+                        ),
                       ),
                     ),
-                  )
-                : SizedBox(
-                    width: 70,
-                    child: ElevatedButton(
-                      style: ButtonStyle(backgroundColor:
-                          MaterialStateProperty.resolveWith<Color>(
-                              (Set<MaterialState> states) {
-                        if (states.contains(MaterialState.pressed))
-                          return Theme.of(context).primaryColor.withOpacity(1);
-                        else if (states.contains(MaterialState.disabled))
-                          return Colors.black26;
-                        return Theme.of(context).primaryColor; //
-                      })),
-                      onPressed: () {
-                        setState(() {
-                          isConnected = true;
-                        });
-                      },
-                      child: SizedBox(
-                        height: 13,
-                        width: 13,
-                        child: CircularProgressIndicator(
-                            strokeWidth: 2.0, backgroundColor: Colors.white),
-                      ),
-                    ),
-                  ),
-          ),
-        ],
-      );
-    });
+            ),
+          ],
+        );
+      },
+    );
   }
 
   _outPutBox() {
@@ -353,31 +366,30 @@ class _ApiPagedataState extends State<ApiPagedata>
       );
     } else {
       return !renderHtml
-          ? Expanded(
-              child: SizedBox(
-                height: 500,
-                width: double.infinity,
-                child: Card(
-                  color: Colors.white70,
-                  shape: RoundedRectangleBorder(
-                    borderRadius:
-                        BorderRadius.circular(4.0), // if you need this
-                    side: BorderSide(
-                      color: Colors.grey.withOpacity(0.2),
-                      width: 1,
-                    ),
+          ? SizedBox(
+              height: 50.h,
+              width: double.infinity,
+              child: Card(
+                color: Colors.black12,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(4.0), // if you need this
+                  side: BorderSide(
+                    color: Colors.grey.withOpacity(0.2),
+                    width: 1,
                   ),
-                  child: HighlightView(
-                    !error
-                        ? getPrettyJSONString(result["body"])
-                        : result["error"],
-                    language: lang,
-                    theme: githubTheme,
-                    padding: EdgeInsets.all(12),
-                    textStyle: TextStyle(
-                      fontFamily: 'Consolas',
-                      fontSize: 14,
-                    ),
+                ),
+                child: HighlightView(
+                  !error
+                      ? getPrettyJSONString(result["body"])
+                      : result["error"],
+                  language: lang,
+                  // theme: githubTheme,
+                  // theme: androidstudioTheme,
+                  theme: solarizedLightTheme,
+                  padding: EdgeInsets.all(12),
+                  textStyle: TextStyle(
+                    fontFamily: 'Consolas',
+                    fontSize: 14,
                   ),
                 ),
               ),
@@ -412,8 +424,7 @@ class _ApiPagedataState extends State<ApiPagedata>
     if (result["error"] != null) {
       hdata = result["error"];
     }
-    return Expanded(
-        child: SingleChildScrollView(
+    return SingleChildScrollView(
       child: SizedBox(
         width: double.infinity,
         child: Card(
@@ -447,7 +458,7 @@ class _ApiPagedataState extends State<ApiPagedata>
           ),
         ),
       ),
-    ));
+    );
   }
 
 //good

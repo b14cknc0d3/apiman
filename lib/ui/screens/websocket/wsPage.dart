@@ -1,79 +1,29 @@
 import 'package:flutter/material.dart';
+import 'package:sizer/sizer.dart';
 import 'package:tabbed_view/tabbed_view.dart';
-import 'package:websocket_tester/database/database.dart';
 
 import 'package:websocket_tester/ui/screens/api/apiPageData.dart';
+import 'package:websocket_tester/ui/screens/websocket/wsPageData.dart';
 
-import 'package:easy_localization/easy_localization.dart';
+class WsPage extends StatefulWidget {
+  const WsPage({Key? key}) : super(key: key);
 
-class ApiPage extends StatelessWidget {
   @override
-  Widget build(BuildContext context) {
-    return ApiView();
-  }
+  _WsPageState createState() => _WsPageState();
 }
 
-class ApiView extends StatefulWidget {
-  @override
-  _ApiViewState createState() => _ApiViewState();
-}
-
-int? pageViewIndex;
-
-class _ApiViewState extends State<ApiView> with TickerProviderStateMixin {
-  List<TabData> tabs = [
-    // TabData(
-    //     text: "default",
-    //     content: ApiPagedata(
-    //       tabId: 0,
-    //     ),
-    //     closable: false)
-  ];
+class _WsPageState extends State<WsPage> {
+  // late final AudioCache _audioCache;
+  List messages = [];
+  List<TabData> tabs = [];
   late TabbedViewController _model;
 
-  // reference to our single class that manages the database
-  final dbHelper = DatabaseHelper.instance;
+  // final TextEditingController _controller = TextEditingController();
 
-  @override
-  void dispose() {
-    super.dispose();
-  }
-
-  @override
-  void initState() {
-    row() async {
-      final rows = await dbHelper.queryAllRowOrderByTabId();
-
-      print("Querying ALl Row......");
-      // print(allRows);
-      for (int i = 0; i < rows.length; i++) {
-        // var tabID = rows[i]["tabId"];
-        print(i);
-        tabs.add(TabData(
-            text: "api_tab $i",
-            closable: i == 0 ? false : true,
-            content: ApiPagedata(row: rows[i])));
-      }
-    }
-
-    row();
-
-    // var rows = (_)async{ return await _query();}
-
-    // for (int i = 1; i < 3; i++) {
-    //   tabs.add(TabData(
-    //     text: "Tab $i",
-    //     content: ApiPagedata(
-    //       tabId: i,
-    //     ),
-    //   ));
-
-    // }
-//
-    _model = TabbedViewController(tabs);
-
-    super.initState();
-  }
+  // final TextEditingController _pathController = TextEditingController();
+  // final TextEditingController _headerController = TextEditingController();
+  // final WsAPiLoader wsAPiLoader = WsAPiLoader();
+  // IOWebSocketChannel? _channel;
 
   bool _onTabClosing(int tabIndex) {
     if (tabIndex == 0) {
@@ -82,6 +32,13 @@ class _ApiViewState extends State<ApiView> with TickerProviderStateMixin {
     }
     print('Closing tab $tabIndex...');
     return true;
+  }
+
+  @override
+  void initState() {
+    _model = TabbedViewController(tabs);
+
+    super.initState();
   }
 
   @override
@@ -151,8 +108,9 @@ class _ApiViewState extends State<ApiView> with TickerProviderStateMixin {
               onPressed: () {
                 // int millisecond = DateTime.now().millisecondsSinceEpoch;
                 _model.addTab(TabData(
-                  text: 'api_tab ${tabsCount + 1}',
-                  content: ApiPagedata(
+                  keepAlive: true,
+                  text: 'ws_tab ${tabsCount + 1}',
+                  content: WsPageData(
                     row: {},
                   ),
                 ));
@@ -175,16 +133,4 @@ class _ApiViewState extends State<ApiView> with TickerProviderStateMixin {
       child: tabbedView,
     ));
   }
-
-  // Future<List<Map<String, dynamic>>> _query() async {
-
-  //   // for (var row in allRows) {
-  //   //   print(row);
-  //   // }
-  //   return rows;
-  // }
-
-  // _queryTab() async {
-  //   // final tabList = await dbHelper.
-  // }
 }

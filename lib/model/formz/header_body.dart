@@ -9,9 +9,6 @@ class HeaderBody extends FormzInput<String, HBValidationError> {
 
   @override
   HBValidationError? validator(String value) {
-    print("--hb-bool----");
-    print(isJson(value));
-    print("--hb-bool----");
     bool isValid = isJson(value);
     return isValid ? null : HBValidationError.invalid;
   }
@@ -25,10 +22,14 @@ class Url extends FormzInput<String, UrlValidationError> {
 
   @override
   UrlValidationError? validator(String value) {
-    print("--ur-bool----");
-    print(isURL(value));
-    print("-url--bool----");
-    bool isValid = isURL(value);
+    var opt = {
+      'protocols': ['http', 'https', 'ftp', 'wss', 'ws'],
+      'require_tld': true,
+      'require_protocol': false,
+      'allow_underscores': false,
+    };
+
+    bool isValid = isURL(value, opt);
     return isValid ? null : UrlValidationError.invalid;
   }
 }
@@ -41,9 +42,6 @@ class Method extends FormzInput<String, MethodValidationError> {
 
   @override
   MethodValidationError? validator(String value) {
-    print("-method--bool----");
-    print((value.runtimeType == String));
-    print("-method--bool----");
     bool isValid = (value.runtimeType == String);
     return isValid ? null : MethodValidationError.invalid;
   }

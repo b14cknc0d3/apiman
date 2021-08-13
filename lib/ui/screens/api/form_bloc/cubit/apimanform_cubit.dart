@@ -49,6 +49,7 @@ class ApimanformCubit extends Cubit<ApimanformState> {
   }
 
   Future<void> formSummits() async {
+    //when pressed sumit
     if (!state.status.isValidated) return;
     emit(state.copyWith(status: FormzStatus.submissionInProgress));
 
