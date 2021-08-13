@@ -65,7 +65,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     ApiLoader apiLoader = ApiLoader();
- 
+
     const title = 'ApiMan';
     return FutureBuilder(
         future: Future.delayed(Duration(milliseconds: 300)),
@@ -87,9 +87,7 @@ class MyApp extends StatelessWidget {
                 ),
                 BlocProvider(
                     create: (context) => ApimanformCubit(apiLoader: apiLoader)),
-                BlocProvider(
-                    create: (context) =>
-                        WsformcubitCubit()),
+                BlocProvider(create: (context) => WsformcubitCubit()),
               ],
               child: BlocBuilder<LangCubit, LangState>(
                 buildWhen: (previousState, currentState) =>

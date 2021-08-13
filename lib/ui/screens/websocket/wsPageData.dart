@@ -1,6 +1,6 @@
 import 'dart:async';
-import 'dart:convert';
 
+import 'package:logger/logger.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:formz/formz.dart';
@@ -32,18 +32,28 @@ class _WsPageDataState extends State<WsPageData> {
   IOWebSocketChannel? _channel;
   bool isConnected = false;
   bool snapshotHasData = false;
+  String websocketError = "";
   List result = [];
   List command = [];
+
   @override
   void initState() {
-    setState(() {
-      if (_channel != null) {
-        isConnected = !isConnected;
-      }
-    });
-    // TODO: implement initState
+    // if (_channel != null) {
+    //   isConnected = !isConnected;
+    // }
     super.initState();
   }
+
+  var logger = Logger(
+    printer: PrettyPrinter(
+        methodCount: 2, // number of method calls to be displayed
+        errorMethodCount: 8, // number of method calls if stacktrace is provided
+        lineLength: 120, // width of the output
+        colors: true, // Colorful log messages
+        printEmojis: true, // Print an emoji for each log message
+        printTime: false // Should each log print contain a timestamp
+        ),
+  );
 
   @override
   void dispose() {
@@ -156,6 +166,10 @@ class _WsPageDataState extends State<WsPageData> {
 
             Divider(),
 
+            ///[status_bar]
+            _buildStatusBar(),
+            Divider(),
+
             ///[stream_data_view]
             ///
             _buildStreamBody()
@@ -214,37 +228,38 @@ class _WsPageDataState extends State<WsPageData> {
                               // context.read<WsformcubitCubit>().connectSocket();
                               String url = state.url.value;
                               String headers = state.header.value;
-                              print("url --- $url");
-                              print("headers --- $headers");
-                              setState(() {
-                                _channel = _webSocketProvider.connectSocket(
-                                    url, headers);
+                              // print("url --- $url");
+                              // print("headers --- $headers");
 
-                                if (_channel != null) {
-                                  isConnected = !isConnected;
-                                }
-                              });
-                              ss = _channel?.stream.listen((data) {
-                                if (data != null) {
-                                  setState(() {
-                                    result.add(data.toString());
-                                    print(result);
-                                  });
-                                }
-                              }, onError: (e) {
-                                isConnected = !isConnected;
+                              final Future futureChannel = _webSocketProvider
+                                  .connectSocket(url, headers);
+                              futureChannel.then((future) {
+                                setState(() {
+                                  _channel = future;
+                                  isConnected = true;
+                                  _channel!.stream.listen((data) {
+                                    setState(() {
+                                      result.add(data.toString());
+                                      logger.i("isConnected");
+                                    });
+
+                                    logger.i(result);
+                                  }, onError: (e) {
+                                    _channel = null;
+                                    isConnected = false;
+                                    websocketError = e.toString();
+                                  }, cancelOnError: true);
+                                });
+                              }).catchError((error) {
+                                setState(() {
+                                  _channel = null;
+                                  isConnected = false;
+                                  websocketError = error.toString();
+                                });
+                                logger.wtf(websocketError);
                               });
 
-                              // ss = _channel?.stream.listen((event) {
-                              //   // print(event);
-                              // }, onDone: () {
-                              //   _channel?.sink.close();
-                              //   //  final IOWebSocketChannel _channel = wsAPiLoader.getConnect(path);
-                              // }, onError: (e) {
-                              //   print("----error-----");
-                              //   print(e);
-                              //   print("----error-----");
-                              // }, cancelOnError: true);
+                              ///add [channel.data] to [result]
                             }
                           : null,
                       child: Text("connect".tr()),
@@ -257,15 +272,22 @@ class _WsPageDataState extends State<WsPageData> {
                           MaterialStateProperty.resolveWith<Color>(
                               (Set<MaterialState> states) {
                         if (states.contains(MaterialState.pressed))
-                          return Theme.of(context).primaryColor.withOpacity(1);
+                          return Theme.of(context)
+                              .backgroundColor
+                              .withOpacity(1);
                         else if (states.contains(MaterialState.disabled))
                           return Colors.black26;
                         return Theme.of(context).primaryColor; //
                       })),
-                      onPressed: null,
+                      onPressed: () {
+                        setState(() {
+                          isConnected = !isConnected;
+                          _channel?.sink.close();
+                        });
+                      },
                       child: Text(
-                        "connected".tr(),
-                        style: TextStyle(color: Colors.green[900]),
+                        "cancle".tr(),
+                        style: TextStyle(color: Colors.white),
                       ),
                     ),
                   ),
@@ -347,12 +369,23 @@ class _WsPageDataState extends State<WsPageData> {
                       return Theme.of(context).primaryColor; //
                     }),
                   ),
-                  onPressed: () {
-                    String body = state.body.value;
-                    command.add(body);
-
-                    _channel!.sink.add(body);
-                  },
+                  onPressed: !state.status.isValidated
+                      ? null
+                      : isConnected == false
+                          ? null
+                          : () {
+                              print(
+                                  (!state.status.isValidated && !isConnected));
+                              String body = state.body.value;
+                              command.add(body);
+                              logger.i(command);
+                              // _channel!.then(());
+                              try {
+                                _channel!.sink.add(body);
+                              } catch (e) {
+                                print(e);
+                              }
+                            },
                   child: Text("send".tr()),
                 ),
               ),
@@ -374,7 +407,6 @@ class _WsPageDataState extends State<WsPageData> {
             child: Scrollbar(
               controller: _scrollController,
               child: Card(
-                color: Colors.yellow[100],
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(4.0), // if you need this
                   side: BorderSide(
@@ -392,7 +424,11 @@ class _WsPageDataState extends State<WsPageData> {
                         mainAxisAlignment: MainAxisAlignment.start,
                         children: [
                           Divider(),
-                          command[idx] != null
+
+                          ///sometime there will be [no command ]but incomming
+                          ///[check index]
+                          ///
+                          command.asMap().containsKey(idx)
                               ? Container(
                                   height: 24,
                                   color: Colors.white,
@@ -423,29 +459,34 @@ class _WsPageDataState extends State<WsPageData> {
                           //       SelectableText("${command[idx]}"),
                           // ),
                           Divider(),
-                          Container(
-                            height: 24,
-                            child: SingleChildScrollView(
-                              scrollDirection: Axis.horizontal,
-                              child: Row(
-                                mainAxisSize: MainAxisSize.max,
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                // crossAxisAlignment: CrossA,
-                                children: [
-                                  Padding(
-                                    padding:
-                                        EdgeInsets.only(left: 1.w, right: 1.w),
-                                    child: Icon(
-                                      Icons.arrow_circle_down,
-                                      color: Theme.of(context).primaryColor,
+                          result.asMap().containsKey(idx)
+                              ? Container(
+                                  color: Colors.yellow[100],
+                                  height: 24,
+                                  child: SingleChildScrollView(
+                                    scrollDirection: Axis.horizontal,
+                                    child: Row(
+                                      mainAxisSize: MainAxisSize.max,
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      // crossAxisAlignment: CrossA,
+                                      children: [
+                                        Padding(
+                                          padding: EdgeInsets.only(
+                                              left: 1.w, right: 1.w),
+                                          child: Icon(
+                                            Icons.arrow_circle_down,
+                                            color:
+                                                Theme.of(context).primaryColor,
+                                          ),
+                                        ),
+                                        SelectableText("${result[idx]}"),
+                                      ],
                                     ),
                                   ),
-                                  SelectableText("${result[idx]}"),
-                                ],
-                              ),
-                            ),
-                          ),
+                                )
+                              : Container(),
+
                           // ListTile(
                           //   leading: Icon(Icons.arrow_circle_down),
                           //   title: SelectableText("${result[idx]}"),
@@ -481,6 +522,31 @@ class _WsPageDataState extends State<WsPageData> {
         //       });
         // }
       },
+    );
+  }
+
+  _buildStatusBar() {
+    return Container(
+      child: SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        child: Row(
+          children: [
+            Padding(
+              padding: EdgeInsets.only(left: 1.w),
+              child: ElevatedButton.icon(
+                onPressed: null,
+                icon: Icon(Icons.circle,
+                    size: 12,
+                    color: isConnected ? Theme.of(context).primaryColor : null),
+                label: isConnected
+                    ? Text("connected",
+                        style: TextStyle(color: Theme.of(context).primaryColor))
+                    : Text("connect"),
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

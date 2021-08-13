@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:sizer/sizer.dart';
 import 'package:tabbed_view/tabbed_view.dart';
@@ -46,11 +47,15 @@ class _WsPageState extends State<WsPage> {
     TabbedViewTheme theme = TabbedViewTheme();
 
     theme.menu
+
+      // ..hoverColor =
+      // ..padding = EdgeInsets.only(top: 8, bottom: 10)
+      ..color = Theme.of(context).backgroundColor
       ..dividerThickness = 2.0
-      // ..border = Border.all(
-      //   width: 2.0,
-      //   style: BorderStyle.solid,
-      // )
+      ..border = Border.all(
+        width: 2.0,
+        style: BorderStyle.solid,
+      )
       // ..border = Bor
       ..textStyle = TextStyle(
         color: Colors.black,
@@ -90,23 +95,24 @@ class _WsPageState extends State<WsPage> {
       ..highlightedStatus.decoration =
           BoxDecoration(color: Colors.green[50], borderRadius: borderRadius);
 
-    theme.tabsArea.buttonsArea..padding = EdgeInsets.only(bottom: 8, right: 8);
+    theme.tabsArea.buttonsArea
+      ..buttonIconSize = 22
+      ..decoration =
+          BoxDecoration(color: Colors.green[50], borderRadius: borderRadius)
+      ..padding = EdgeInsets.only(bottom: 4, right: 8);
     // ..decoration = BoxDecoration(color: Theme.of(context).primaryColor);
 
     TabbedView tabbedView = TabbedView(
         onTabClosing: _onTabClosing,
         controller: _model,
         theme: theme,
-        contentBuilder: (ctx, idx) => IndexedStack(
-              index: _model.selectedIndex,
-              children: tabs.map((e) => e.content!).toList(),
-            ),
         tabsAreaButtonsBuilder: (context, tabsCount) {
           List<TabButton> buttons = [];
           buttons.add(TabButton(
-              icon: Icons.add,
-              onPressed: () {
+              icon: Icons.add_box_rounded,
+              onPressed: () async {
                 // int millisecond = DateTime.now().millisecondsSinceEpoch;
+                Future.delayed(Duration(seconds: 1));
                 _model.addTab(TabData(
                   keepAlive: true,
                   text: 'ws_tab ${tabsCount + 1}',
@@ -115,15 +121,7 @@ class _WsPageState extends State<WsPage> {
                   ),
                 ));
               }));
-          // if (tabsCount > 0) {
-          //   buttons.add(TabButton(
-          //       icon: Icons.delete,
-          //       onPressed: () {
-          //         if (_model.selectedIndex != null) {
-          //           _model.removeTab(_model.selectedIndex!);
-          //         }
-          //       }));
-          // }
+
           return buttons;
         });
 

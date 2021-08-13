@@ -4,7 +4,7 @@ import 'package:web_socket_channel/io.dart';
 class WebSocketProvider {
   // String url = "ws://127.0.0.1:8080";
 
-  connectSocket(String path, headers) {
+  Future<IOWebSocketChannel> connectSocket(String path, headers) async {
     Map<String, dynamic> defaultHeaders = {};
     if (headers != null) {
       defaultHeaders.updateAll((key, value) => headers);

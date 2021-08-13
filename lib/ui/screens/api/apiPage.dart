@@ -50,6 +50,7 @@ class _ApiViewState extends State<ApiView> with TickerProviderStateMixin {
         // var tabID = rows[i]["tabId"];
         print(i);
         tabs.add(TabData(
+            keepAlive: true,
             text: "api_tab $i",
             closable: i == 0 ? false : true,
             content: ApiPagedata(row: rows[i])));
@@ -89,11 +90,15 @@ class _ApiViewState extends State<ApiView> with TickerProviderStateMixin {
     TabbedViewTheme theme = TabbedViewTheme();
 
     theme.menu
+
+      // ..hoverColor =
+      // ..padding = EdgeInsets.only(top: 8, bottom: 10)
+      ..color = Theme.of(context).backgroundColor
       ..dividerThickness = 2.0
-      // ..border = Border.all(
-      //   width: 2.0,
-      //   style: BorderStyle.solid,
-      // )
+      ..border = Border.all(
+        width: 2.0,
+        style: BorderStyle.solid,
+      )
       // ..border = Bor
       ..textStyle = TextStyle(
         color: Colors.black,
@@ -133,24 +138,29 @@ class _ApiViewState extends State<ApiView> with TickerProviderStateMixin {
       ..highlightedStatus.decoration =
           BoxDecoration(color: Colors.green[50], borderRadius: borderRadius);
 
-    theme.tabsArea.buttonsArea..padding = EdgeInsets.only(bottom: 8, right: 8);
+    theme.tabsArea.buttonsArea
+      ..buttonIconSize = 22
+      ..decoration =
+          BoxDecoration(color: Colors.green[50], borderRadius: borderRadius)
+      ..padding = EdgeInsets.only(bottom: 4, right: 8);
     // ..decoration = BoxDecoration(color: Theme.of(context).primaryColor);
 
     TabbedView tabbedView = TabbedView(
         onTabClosing: _onTabClosing,
         controller: _model,
         theme: theme,
-        contentBuilder: (ctx, idx) => IndexedStack(
-              index: _model.selectedIndex,
-              children: tabs.map((e) => e.content!).toList(),
-            ),
+        // contentBuilder: (ctx, idx) => IndexedStack(
+        //       index: _model.selectedIndex,
+        //       children: tabs.map((e) => e.content!).toList(),
+        //     ),
         tabsAreaButtonsBuilder: (context, tabsCount) {
           List<TabButton> buttons = [];
           buttons.add(TabButton(
-              icon: Icons.add,
+              icon: Icons.add_box_rounded,
               onPressed: () {
                 // int millisecond = DateTime.now().millisecondsSinceEpoch;
                 _model.addTab(TabData(
+                  keepAlive: true,
                   text: 'api_tab ${tabsCount + 1}',
                   content: ApiPagedata(
                     row: {},
