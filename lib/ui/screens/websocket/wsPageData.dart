@@ -57,8 +57,8 @@ class _WsPageDataState extends State<WsPageData> {
 
   @override
   void dispose() {
-    ss!.cancel();
-    _channel!.sink.close();
+    ss?.cancel();
+    _channel?.sink.close();
     _urlController.dispose();
     _headersController.dispose();
     _bodyController.dispose();
@@ -240,10 +240,7 @@ class _WsPageDataState extends State<WsPageData> {
                                   _channel!.stream.listen((data) {
                                     setState(() {
                                       result.add(data.toString());
-                                      logger.i("isConnected");
                                     });
-
-                                    logger.i(result);
                                   }, onError: (e) {
                                     _channel = null;
                                     isConnected = false;
@@ -378,7 +375,7 @@ class _WsPageDataState extends State<WsPageData> {
                                   (!state.status.isValidated && !isConnected));
                               String body = state.body.value;
                               command.add(body);
-                              logger.i(command);
+
                               // _channel!.then(());
                               try {
                                 _channel!.sink.add(body);
@@ -430,8 +427,15 @@ class _WsPageDataState extends State<WsPageData> {
                           ///
                           command.asMap().containsKey(idx)
                               ? Container(
+                                  decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    borderRadius:
+                                        BorderRadius.all(Radius.circular(4.0)),
+                                  ),
+
                                   height: 24,
-                                  color: Colors.white,
+                                  width: 100.w,
+                                  // color: Colors.white,
                                   child: SingleChildScrollView(
                                     scrollDirection: Axis.horizontal,
                                     child: Row(
@@ -461,8 +465,13 @@ class _WsPageDataState extends State<WsPageData> {
                           Divider(),
                           result.asMap().containsKey(idx)
                               ? Container(
-                                  color: Colors.yellow[100],
+                                  decoration: BoxDecoration(
+                                    color: Colors.yellow[100],
+                                    borderRadius:
+                                        BorderRadius.all(Radius.circular(4.0)),
+                                  ),
                                   height: 24,
+                                  width: 100.w,
                                   child: SingleChildScrollView(
                                     scrollDirection: Axis.horizontal,
                                     child: Row(
