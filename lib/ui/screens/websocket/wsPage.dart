@@ -2,8 +2,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:sizer/sizer.dart';
 import 'package:tabbed_view/tabbed_view.dart';
+import 'package:websocket_tester/database/database.dart';
 
-import 'package:websocket_tester/ui/screens/api/apiPageData.dart';
 import 'package:websocket_tester/ui/screens/websocket/wsPageData.dart';
 
 class WsPage extends StatefulWidget {
@@ -18,6 +18,7 @@ class _WsPageState extends State<WsPage> {
   List messages = [];
   List<TabData> tabs = [];
   late TabbedViewController _model;
+  final dbHelper = DatabaseHelper.instance;
 
   // final TextEditingController _controller = TextEditingController();
 
@@ -37,6 +38,23 @@ class _WsPageState extends State<WsPage> {
 
   @override
   void initState() {
+    row() async {
+      final rows = await dbHelper.queryAllWsRowOrderByTabId();
+
+      print("Querying ws All Row......");
+      // print(allRows);
+      for (int i = 0; i < rows.length; i++) {
+        // var tabID = rows[i]["tabId"];
+        print(i);
+        tabs.add(TabData(
+            keepAlive: true,
+            text: "ws_tab $i",
+            closable: i == 0 ? false : true,
+            content: WsPageData(row: rows[i])));
+      }
+    }
+
+    row();
     _model = TabbedViewController(tabs);
 
     super.initState();

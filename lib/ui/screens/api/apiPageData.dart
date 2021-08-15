@@ -614,7 +614,8 @@ class _ApiPagedataState extends State<ApiPagedata>
           _dataController1.text.isNotEmpty ? _dataController1.text : "",
       DatabaseHelper.columnResult: result != null ? json.encode(result) : "",
       DatabaseHelper.columnTabId:
-          widget.row.isNotEmpty ? widget.row["tabId"] : 1
+          widget.row.isNotEmpty ? widget.row["tabId"] : 1,
+      DatabaseHelper.columnBackendType: "http",
     };
     final id = await dbHelper.insert(row);
     print('inserted row id:$id');
@@ -636,7 +637,8 @@ class _ApiPagedataState extends State<ApiPagedata>
           _dataController1.text.isNotEmpty ? _dataController1.text : "",
       DatabaseHelper.columnResult: result != null ? json.encode(result) : "",
       DatabaseHelper.columnTabId:
-          widget.row.isNotEmpty ? widget.row["tabId"] : 1
+          widget.row.isNotEmpty ? widget.row["tabId"] : 1,
+      DatabaseHelper.columnBackendType: "http",
     };
     final rowUpdated = dbHelper.update(row);
     print("updated $rowUpdated row(s)");

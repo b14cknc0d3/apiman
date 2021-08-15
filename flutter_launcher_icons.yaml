@@ -1,7 +1,7 @@
 flutter_icons:
   android: "launcher_icon"
   ios: true
-  image_path: "assets/icon/app_icon.ico"
+  image_path: "assets/icon/app_icon.png"
 
 # flutter pub run flutter_native_splash:create --path=path/to/my/file.yaml
 # flutter pub run flutter_launcher_icons:main -f flutter_launcher_icons.yaml
@@ -34,9 +34,9 @@ flutter_native_splash:
   # parameters from above. If the image_dark parameter is specified, color_dark or 
   # background_image_dark must be specified.  color_dark and background_image_dark cannot both be
   # set.
-  color_dark: "#042a49"
-  # background_image_dark: "assets/splash.png"
-  image_dark: assets/splash.png
+  # color_dark: "#042a49"
+  # # background_image_dark: "assets/splash.png"
+  # image_dark: assets/splash.png
 
   # The android, ios and web parameters can be used to disable generating a splash screen on a given 
   # platform.

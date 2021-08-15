@@ -1,16 +1,20 @@
 import 'dart:async';
-import 'dart:convert';
+
+import 'dart:io';
 
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 
 import 'package:formz/formz.dart';
+import 'package:web_socket_channel/io.dart';
 
 import 'package:websocket_tester/model/formz/header_body.dart';
+import 'package:websocket_tester/ws_service/web_socket_provider.dart';
 
 part 'wsformcubit_state.dart';
 
 class WsformcubitCubit extends Cubit<WsformcubitState> {
+  // IOWebSocketChannel? _channel;
   WsformcubitCubit() : super(WsformcubitState());
   void urlChanged(String value) {
     final url = Url.dirty(value);
@@ -46,6 +50,44 @@ class WsformcubitCubit extends Cubit<WsformcubitState> {
         ])));
   }
 
+  // Future<IOWebSocketChannel> connect(String path, var headers) async {
+  //   emit(WsformcubitState(status: FormzStatus.submissionInProgress));
+
+  //   final uri = Uri.parse(path);
+  //   try {
+  //     final _channel = IOWebSocketChannel.connect(uri, headers: headers
+  //         // headers: {"Authorization": "Token $token"}
+  //         );
+  //     final channel = webSocketProvider.connectSocket(path, headers);
+
+  //     emit(WsformcubitState(
+  //         channel: _channel, status: FormzStatus.submissionSuccess));
+  //     ss = _channel.stream.listen(
+  //       (event) {
+  //         if (event != null) {
+  //           emit(WsformcubitState(
+  //               message: event.toString(),
+  //               status: FormzStatus.submissionSuccess));
+  //         }
+  //       },
+  //       onError: (e) {
+  //         print(e);
+
+  //         emit(WsformcubitState(status: FormzStatus.submissionFailure));
+  //       },
+  //       cancelOnError: true,
+  //     );
+  //     return channel;
+  //   } on WebSocketException catch (e) {
+  //     print(e);
+  //     emit(WsformcubitState(status: FormzStatus.submissionFailure));
+  //     throw WebSocketException();
+  //   } catch (e) {
+  //     emit(WsformcubitState(status: FormzStatus.submissionFailure));
+  //     throw Exception();
+  //     // return c;
+  //   }
+}
   // void loading() {
   //   emit(state.copyWith(connected: false));
   // }
@@ -104,4 +146,4 @@ class WsformcubitCubit extends Cubit<WsformcubitState> {
   //     stream.sink.add(data);
   //   } catch (e) {}
   // }
-}
+

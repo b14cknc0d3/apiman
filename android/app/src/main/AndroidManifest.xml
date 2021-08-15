@@ -1,8 +1,10 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.websocket_tester">
    <application
-        android:label="websocket_tester"
-        android:icon="@mipmap/launcher_icon">
+        android:label="ApiMan"
+        android:icon="@mipmap/launcher_icon"
+        android:usesCleartextTraffic="true"
+        >
         <activity
             android:name=".MainActivity"
             android:launchMode="singleTop"
@@ -10,6 +12,7 @@
             android:configChanges="orientation|keyboardHidden|keyboard|screenSize|smallestScreenSize|locale|layoutDirection|fontScale|screenLayout|density|uiMode"
             android:hardwareAccelerated="true"
             android:windowSoftInputMode="adjustResize">
+            
             <!-- Specifies an Android theme to apply to this Activity as soon as
                  the Android process has started. This theme is visible to the user
                  while the Flutter UI initializes. After that, this theme continues
@@ -39,5 +42,5 @@
             android:value="2" />
     </application>
       <uses-permission android:name="android.permission.INTERNET"/>
-      <application android:usesCleartextTraffic="true"/> <!-- Add this -->
+      <!-- <application android:usesCleartextTraffic="true"/> Add this -->
 </manifest>

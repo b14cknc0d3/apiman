@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:web_socket_channel/io.dart';
 // import 'package:web_socket_channel/web_socket_channel.dart';
 
@@ -11,12 +13,19 @@ class WebSocketProvider {
     }
     // final token =
     //     "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNjI3ODQwMzUwLCJqdGkiOiIzZTlkYzc5OWQwYTc0OGVmYTI1OWM5NGExNzc0YjRkZCIsInVzZXJfaWQiOjF9.onMU3FwxanzHpNHclelaetzFHqEgv5Sv2bsyum5QgEM";
-    final uri = Uri.parse(path);
-    final channel = IOWebSocketChannel.connect(uri, headers: defaultHeaders
-        // headers: {"Authorization": "Token $token"}
-        );
-    print("connecting to channel");
-    return channel;
+    try {
+      final uri = Uri.parse(path);
+      final channel = IOWebSocketChannel.connect(uri, headers: defaultHeaders
+          // headers: {"Authorization": "Token $token"}
+          );
+      print("connecting to channel");
+      return channel;
+    } on WebSocketException catch (e) {
+      print(e);
+      throw WebSocketException();
+    } catch (e) {
+      throw Exception();
+    }
   }
 
   sendData(IOWebSocketChannel channel, String data) {

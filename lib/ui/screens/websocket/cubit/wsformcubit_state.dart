@@ -6,11 +6,19 @@ class WsformcubitState extends Equatable {
   final HeaderBody body;
   // final bool connected;
   // final bool snapShotReceived;
+  // final String message;
+
+  ///[to delete]
   final FormzStatus status;
+  // final IOWebSocketChannel? channel;
+
+  ///[to delete]
   // final dynamic result;
 
   const WsformcubitState(
       {
+      //   this.message = "",
+      // this.channel,
       //   this.result = "",
       // this.connected = false,
       // this.snapShotReceived = false,
@@ -25,11 +33,19 @@ class WsformcubitState extends Equatable {
     HeaderBody? body,
     FormzStatus? status,
     Method? method,
+    String? message,
+
+    ///
+    IOWebSocketChannel? channel,
+
+    ///
     // dynamic result,
     // bool? connected,
     // bool? snapShotReceived
   }) {
     return WsformcubitState(
+      // channel: channel ?? this.channel,
+      // message: message ?? this.message,
       // snapShotReceived ?? this.snapShotReceived,
       // connected ?? this.connected,
       // result ?? this.result,

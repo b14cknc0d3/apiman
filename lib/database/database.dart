@@ -17,6 +17,8 @@ class DatabaseHelper {
   static final columnBody = 'body';
   static final columnResult = 'result';
   static final columnTabId = 'tabId';
+  static final columnWorkspace = "workspace";
+  static final columnBackendType = "backend_type";
 
   // make this a singleton class
   DatabaseHelper._privateConstructor();
@@ -55,6 +57,8 @@ class DatabaseHelper {
   ,$columnBody     TEXT
   ,$columnResult TEXT
   ,$columnTabId   INT
+  ,$columnWorkspace VARCHAR(225)
+  ,$columnBackendType VARCHAR(10)
 );
           ''');
   }
@@ -82,6 +86,19 @@ class DatabaseHelper {
     return await db.rawQuery('SELECT  * FROM ApiMan ORDER  BY "tabId" ASC ');
   }
 
+//TODO :ADD WORKSPACE support [AND workspace = "$input"]
+  Future<List<Map<String, dynamic>>> queryAllApiRowOrderByTabId() async {
+    Database db = await instance.database;
+    return await db.rawQuery(
+        'SELECT  * FROM ApiMan WHERE "backend_type" = "http" ORDER  BY "tabId" ASC ');
+  }
+
+  Future<List<Map<String, dynamic>>> queryAllWsRowOrderByTabId() async {
+    Database db = await instance.database;
+    return await db.rawQuery(
+        'SELECT  * FROM ApiMan WHERE "backend_type" = "ws" ORDER  BY "tabId" ASC ');
+  }
+
   // All of the methods (insert, query, update, delete) can also be done using
   // raw SQL commands. This method uses a raw query to give the row count.
   Future<int?> queryRowCount() async {
@@ -96,6 +113,11 @@ class DatabaseHelper {
     Database db = await instance.database;
     int id = row[columnId];
     return await db.update(table, row, where: '$columnId = ?', whereArgs: [id]);
+  }
+
+  Future deleleAll() async {
+    Database db = await instance.database;
+    return await db.delete(table);
   }
 
   // Deletes the row specified by the id. The number of affected rows is

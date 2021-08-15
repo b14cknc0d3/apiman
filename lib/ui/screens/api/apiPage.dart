@@ -42,7 +42,7 @@ class _ApiViewState extends State<ApiView> with TickerProviderStateMixin {
   @override
   void initState() {
     row() async {
-      final rows = await dbHelper.queryAllRowOrderByTabId();
+      final rows = await dbHelper.queryAllApiRowOrderByTabId();
 
       print("Querying ALl Row......");
       // print(allRows);
@@ -59,18 +59,6 @@ class _ApiViewState extends State<ApiView> with TickerProviderStateMixin {
 
     row();
 
-    // var rows = (_)async{ return await _query();}
-
-    // for (int i = 1; i < 3; i++) {
-    //   tabs.add(TabData(
-    //     text: "Tab $i",
-    //     content: ApiPagedata(
-    //       tabId: i,
-    //     ),
-    //   ));
-
-    // }
-//
     _model = TabbedViewController(tabs);
 
     super.initState();
@@ -143,22 +131,16 @@ class _ApiViewState extends State<ApiView> with TickerProviderStateMixin {
       ..decoration =
           BoxDecoration(color: Colors.green[50], borderRadius: borderRadius)
       ..padding = EdgeInsets.only(bottom: 4, right: 8);
-    // ..decoration = BoxDecoration(color: Theme.of(context).primaryColor);
 
     TabbedView tabbedView = TabbedView(
         onTabClosing: _onTabClosing,
         controller: _model,
         theme: theme,
-        // contentBuilder: (ctx, idx) => IndexedStack(
-        //       index: _model.selectedIndex,
-        //       children: tabs.map((e) => e.content!).toList(),
-        //     ),
         tabsAreaButtonsBuilder: (context, tabsCount) {
           List<TabButton> buttons = [];
           buttons.add(TabButton(
               icon: Icons.add_box_rounded,
               onPressed: () {
-                // int millisecond = DateTime.now().millisecondsSinceEpoch;
                 _model.addTab(TabData(
                   keepAlive: true,
                   text: 'api_tab ${tabsCount + 1}',
@@ -167,15 +149,7 @@ class _ApiViewState extends State<ApiView> with TickerProviderStateMixin {
                   ),
                 ));
               }));
-          // if (tabsCount > 0) {
-          //   buttons.add(TabButton(
-          //       icon: Icons.delete,
-          //       onPressed: () {
-          //         if (_model.selectedIndex != null) {
-          //           _model.removeTab(_model.selectedIndex!);
-          //         }
-          //       }));
-          // }
+
           return buttons;
         });
 
@@ -185,16 +159,4 @@ class _ApiViewState extends State<ApiView> with TickerProviderStateMixin {
       child: tabbedView,
     ));
   }
-
-  // Future<List<Map<String, dynamic>>> _query() async {
-
-  //   // for (var row in allRows) {
-  //   //   print(row);
-  //   // }
-  //   return rows;
-  // }
-
-  // _queryTab() async {
-  //   // final tabList = await dbHelper.
-  // }
 }

@@ -1,11 +1,14 @@
 import 'dart:async';
-
+import 'dart:convert';
+import 'package:flutter/scheduler.dart';
 import 'package:logger/logger.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:formz/formz.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:web_socket_channel/io.dart';
+import 'package:web_socket_channel/web_socket_channel.dart';
+import 'package:websocket_tester/database/database.dart';
 
 import 'package:websocket_tester/ui/screens/websocket/cubit/wsformcubit_cubit.dart';
 import 'package:sizer/sizer.dart';
@@ -27,17 +30,48 @@ class _WsPageDataState extends State<WsPageData> {
   final TextEditingController _headersController = TextEditingController();
   final TextEditingController _bodyController = TextEditingController();
   final WebSocketProvider _webSocketProvider = WebSocketProvider();
+  final DatabaseHelper dbHelper = DatabaseHelper.instance;
   ScrollController _scrollController = ScrollController();
   StreamSubscription? ss;
   IOWebSocketChannel? _channel;
+
   bool isConnected = false;
   bool snapshotHasData = false;
   String websocketError = "";
-  List result = [];
-  List command = [];
+  List<Map<String, dynamic>> result = [];
 
+  bool isSaved = false;
   @override
   void initState() {
+    setState(() {
+      _urlController.text = widget.row.isNotEmpty ? widget.row["url"] : "ws";
+      _headersController.text =
+          widget.row.isNotEmpty ? widget.row["headers"] : "{}";
+      _bodyController.text = widget.row.isNotEmpty ? widget.row["body"] : "{}";
+
+      if (widget.row.isNotEmpty) {
+        print("w");
+        var r = json.decode(widget.row["result"]);
+
+        for (var m in r) {
+          m = m as Map<String, dynamic>;
+          result.add(m);
+        }
+        if (_urlController.text.isNotEmpty) {
+          context.read<WsformcubitCubit>().urlChanged(_urlController.text);
+        }
+        if (_headersController.text.isNotEmpty) {
+          context
+              .read<WsformcubitCubit>()
+              .headerChanged(_headersController.text);
+        }
+        if (_bodyController.text.isNotEmpty) {
+          context.read<WsformcubitCubit>().bodyChanged(_bodyController.text);
+        }
+        // result = json.decode(widget.row["result"]) as List<Map>;
+      }
+    });
+
     // if (_channel != null) {
     //   isConnected = !isConnected;
     // }
@@ -57,6 +91,7 @@ class _WsPageDataState extends State<WsPageData> {
 
   @override
   void dispose() {
+    _scrollController.dispose();
     ss?.cancel();
     _channel?.sink.close();
     _urlController.dispose();
@@ -203,11 +238,12 @@ class _WsPageDataState extends State<WsPageData> {
 
           ///[connect button]
           Padding(
-            padding: EdgeInsets.all(8.0),
+            padding: EdgeInsets.all(1.0),
             child: !isConnected
                 ? SizedBox(
                     ///[show connect]
-                    width: 15.w,
+                    width:
+                        SizerUtil.deviceType == DeviceType.mobile ? 20.w : 15.w,
                     child: ElevatedButton(
                       style: ButtonStyle(
                         backgroundColor:
@@ -230,6 +266,30 @@ class _WsPageDataState extends State<WsPageData> {
                               String headers = state.header.value;
                               // print("url --- $url");
                               // print("headers --- $headers");
+                              // final Future futureChannel = context
+                              //     .read<WsformcubitCubit>()
+                              //     .connect(url, headers);
+
+                              // futureChannel.then((future) {
+                              //   setState(() {
+                              //     _channel = future;
+                              //     isConnected = true;
+                              //   });
+                              // }); // print("[state_channel] :${state.channel}");
+                              // Future.delayed(Duration(seconds: 1));
+                              // print(state.channel);
+                              // setState(() {
+                              //   if (state.channel != null) {
+                              //     _channel = state.channel;
+
+                              //     isConnected = true;
+                              //   }
+
+                              //   if (state.message.isNotEmpty) {
+                              //     result.add(state.message);
+                              //     // ignore: unnecessary_statements
+                              //   }
+                              // });
 
                               final Future futureChannel = _webSocketProvider
                                   .connectSocket(url, headers);
@@ -239,7 +299,10 @@ class _WsPageDataState extends State<WsPageData> {
                                   isConnected = true;
                                   _channel!.stream.listen((data) {
                                     setState(() {
-                                      result.add(data.toString());
+                                      Map<String, dynamic> incoming = {
+                                        "in": data.toString()
+                                      };
+                                      result.add(incoming);
                                     });
                                   }, onError: (e) {
                                     _channel = null;
@@ -259,7 +322,12 @@ class _WsPageDataState extends State<WsPageData> {
                               ///add [channel.data] to [result]
                             }
                           : null,
-                      child: Text("connect".tr()),
+                      child: Text("connect".tr(),
+                          style: TextStyle(
+                              fontSize:
+                                  SizerUtil.deviceType == DeviceType.mobile
+                                      ? 8.sp
+                                      : 8.sp)),
                     ),
                   )
                 : SizedBox(
@@ -284,7 +352,11 @@ class _WsPageDataState extends State<WsPageData> {
                       },
                       child: Text(
                         "cancle".tr(),
-                        style: TextStyle(color: Colors.white),
+                        style: TextStyle(
+                            color: Colors.white,
+                            fontSize: SizerUtil.deviceType == DeviceType.mobile
+                                ? 8.sp
+                                : 10.sp),
                       ),
                     ),
                   ),
@@ -317,9 +389,9 @@ class _WsPageDataState extends State<WsPageData> {
           ),
         ),
         Padding(
-          padding: EdgeInsets.all(8.0),
+          padding: EdgeInsets.all(1),
           child: SizedBox(
-            width: 15.w,
+            width: SizerUtil.deviceType == DeviceType.mobile ? 20.w : 15.w,
           ),
         ),
       ],
@@ -352,9 +424,9 @@ class _WsPageDataState extends State<WsPageData> {
               ),
             ),
             Padding(
-              padding: EdgeInsets.all(8.0),
+              padding: EdgeInsets.all(1),
               child: SizedBox(
-                width: 15.w,
+                width: SizerUtil.deviceType == DeviceType.mobile ? 20.w : 15.w,
                 child: ElevatedButton(
                   style: ButtonStyle(
                     backgroundColor: MaterialStateProperty.resolveWith<Color>(
@@ -374,16 +446,33 @@ class _WsPageDataState extends State<WsPageData> {
                               print(
                                   (!state.status.isValidated && !isConnected));
                               String body = state.body.value;
-                              command.add(body);
+                              setState(() {
+                                Map<String, dynamic> out = {
+                                  "out": body.toString()
+                                };
+                                result.add(out);
+                              });
 
                               // _channel!.then(());
                               try {
                                 _channel!.sink.add(body);
-                              } catch (e) {
+                                SchedulerBinding.instance!
+                                    .addPostFrameCallback((timeStamp) {
+                                  _scrollController.animateTo(
+                                    _scrollController.position.maxScrollExtent,
+                                    duration: const Duration(milliseconds: 300),
+                                    curve: Curves.easeOut,
+                                  );
+                                });
+                              } on WebSocketChannelException catch (e) {
                                 print(e);
                               }
                             },
-                  child: Text("send".tr()),
+                  child: Text("send".tr(),
+                      style: TextStyle(
+                          fontSize: SizerUtil.deviceType == DeviceType.mobile
+                              ? 8.sp
+                              : 8.sp)),
                 ),
               ),
             ),
@@ -402,6 +491,8 @@ class _WsPageDataState extends State<WsPageData> {
             height: 35.h,
             width: 100.w,
             child: Scrollbar(
+              showTrackOnHover: true,
+              isAlwaysShown: true,
               controller: _scrollController,
               child: Card(
                 shape: RoundedRectangleBorder(
@@ -411,98 +502,82 @@ class _WsPageDataState extends State<WsPageData> {
                     width: 1,
                   ),
                 ),
-                child: ListView.builder(
-                    controller: _scrollController,
-                    itemCount: result.length,
-                    itemBuilder: (ctx, idx) {
-                      return Column(
-                        mainAxisSize: MainAxisSize.min,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        children: [
-                          Divider(),
-
-                          ///sometime there will be [no command ]but incomming
-                          ///[check index]
-                          ///
-                          command.asMap().containsKey(idx)
-                              ? Container(
-                                  decoration: BoxDecoration(
-                                    color: Colors.white,
-                                    borderRadius:
-                                        BorderRadius.all(Radius.circular(4.0)),
-                                  ),
-
-                                  height: 24,
-                                  width: 100.w,
-                                  // color: Colors.white,
-                                  child: SingleChildScrollView(
-                                    scrollDirection: Axis.horizontal,
-                                    child: Row(
-                                      mainAxisSize: MainAxisSize.max,
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        Padding(
-                                          padding: EdgeInsets.only(
-                                              left: 1.w, right: 1.w),
-                                          child: Icon(
-                                            Icons.arrow_circle_up,
-                                            color: Colors.red[400],
-                                          ),
-                                        ),
-                                        SelectableText("${command[idx]}"),
-                                      ],
+                child: NotificationListener(
+                  child: ListView.builder(
+                      controller: _scrollController,
+                      itemCount: result.length,
+                      itemBuilder: (ctx, idx) {
+                        print(result);
+                        bool command = result[idx].containsKey("out");
+                        print(command);
+                        return Column(
+                          mainAxisSize: MainAxisSize.max,
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            result.asMap().containsKey(idx)
+                                ? Container(
+                                    decoration: BoxDecoration(
+                                      border: Border.all(width: 1.0)
+                                      //   top: BorderSide(
+                                      // color: Colors.black,
+                                      // width: 3.0,
+                                      // )
+                                      ,
+                                      color: !command
+                                          ? Colors.yellow[100]
+                                          : Colors.white,
+                                      // borderRadius: BorderRadius.all(
+                                      //     Radius.circular(4.0)),
                                     ),
-                                  ),
-                                )
-                              : Container(),
-                          // ListTile(
-                          //   leading: Icon(Icons.arrow_circle_up),
-                          //   title:
-                          //       SelectableText("${command[idx]}"),
-                          // ),
-                          Divider(),
-                          result.asMap().containsKey(idx)
-                              ? Container(
-                                  decoration: BoxDecoration(
-                                    color: Colors.yellow[100],
-                                    borderRadius:
-                                        BorderRadius.all(Radius.circular(4.0)),
-                                  ),
-                                  height: 24,
-                                  width: 100.w,
-                                  child: SingleChildScrollView(
-                                    scrollDirection: Axis.horizontal,
-                                    child: Row(
-                                      mainAxisSize: MainAxisSize.max,
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-                                      // crossAxisAlignment: CrossA,
-                                      children: [
-                                        Padding(
-                                          padding: EdgeInsets.only(
-                                              left: 1.w, right: 1.w),
-                                          child: Icon(
-                                            Icons.arrow_circle_down,
-                                            color:
-                                                Theme.of(context).primaryColor,
+                                    height: 30,
+                                    width: 100.w,
+                                    child: SingleChildScrollView(
+                                      scrollDirection: Axis.horizontal,
+                                      child: Row(
+                                        mainAxisSize: MainAxisSize.max,
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        // crossAxisAlignment: CrossA,
+                                        children: [
+                                          Padding(
+                                            padding: EdgeInsets.only(
+                                                left: 1.w, right: 1.w),
+                                            child: Icon(
+                                              !command
+                                                  ? Icons.south_west
+                                                  : Icons.north_east,
+                                              color: Theme.of(context)
+                                                  .primaryColor,
+                                            ),
                                           ),
-                                        ),
-                                        SelectableText("${result[idx]}"),
-                                      ],
+                                          !command
+                                              ? SelectableText(
+                                                  "${result[idx]["in"]}")
+                                              : SelectableText(
+                                                  "${result[idx]["out"]}"),
+                                        ],
+                                      ),
                                     ),
-                                  ),
-                                )
-                              : Container(),
+                                  )
+                                : Container(),
 
-                          // ListTile(
-                          //   leading: Icon(Icons.arrow_circle_down),
-                          //   title: SelectableText("${result[idx]}"),
-                          // ),
-                        ],
-                      );
-                    }),
+                            // ListTile(
+                            //   leading: Icon(Icons.arrow_circle_down),
+                            //   title: SelectableText("${result[idx]}"),
+                            // ),
+                          ],
+                        );
+                      }),
+                  onNotification: (t) {
+                    if (t is ScrollEndNotification) {
+                      print(_scrollController.position.pixels);
+                      return true;
+                    }
+                    print(_scrollController.position.pixels);
+                    return false;
+                  },
+                ),
               ),
             ),
           ),
@@ -553,9 +628,65 @@ class _WsPageDataState extends State<WsPageData> {
                     : Text("connect"),
               ),
             ),
+            Padding(
+              padding: EdgeInsets.only(left: 1.w),
+              child: ElevatedButton.icon(
+                onPressed: isConnected
+                    ? !isSaved
+                        ? () {
+                            _saveDb();
+                            setState(() {
+                              isSaved = true;
+                            });
+                          }
+                        : null
+                    : null,
+                icon: Icon(Icons.save_sharp,
+                    size: 12,
+                    color: isConnected ? Theme.of(context).primaryColor : null),
+                label: isConnected
+                    ? isSaved
+                        ? Text("save",
+                            style: TextStyle(
+                                color: Theme.of(context).primaryColor))
+                        : Text("saved")
+                    : Text("save"),
+              ),
+            ),
+            Padding(
+              padding: EdgeInsets.all(1),
+              child: IconButton(
+                  splashRadius: 2.0,
+                  onPressed: () {
+                    setState(() {
+                      result = [];
+                    });
+                  },
+                  icon: Icon(Icons.clear_all_rounded),
+                  tooltip: "clear output"),
+            )
           ],
         ),
       ),
     );
+  }
+
+  void _saveDb() async {
+    json.encode(result);
+    Map<String, dynamic> row = {
+      DatabaseHelper.columnId: widget.row.isNotEmpty ? widget.row["tabId"] : 1,
+      DatabaseHelper.columnUrl:
+          _urlController.text.isNotEmpty ? _urlController.text : "",
+      DatabaseHelper.columnHeaders:
+          _headersController.text.isNotEmpty ? _headersController.text : "",
+      DatabaseHelper.columnBody:
+          _bodyController.text.isNotEmpty ? _bodyController.text : "",
+      DatabaseHelper.columnResult: json.encode(result),
+      DatabaseHelper.columnTabId:
+          widget.row.isNotEmpty ? widget.row["tabId"] : 1,
+      DatabaseHelper.columnBackendType: "ws",
+    };
+    final id = await dbHelper.insert(row);
+    print('inserted row id:$id');
   }
 }

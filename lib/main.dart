@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:sizer/sizer.dart';
@@ -60,8 +59,6 @@ void main() async {
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({Key? key}) : super(key: key);
-
   @override
   Widget build(BuildContext context) {
     ApiLoader apiLoader = ApiLoader();
@@ -213,6 +210,7 @@ class _MyHomePageState extends State<MyHomePage> {
               WsPage(),
               // _webSocketPage(),
               ApiPage(),
+              BugTestPage(),
               SettingsScreen(),
             ],
             index: _selectedIndex,
@@ -224,240 +222,27 @@ class _MyHomePageState extends State<MyHomePage> {
     // border:InputBorder.,
   }
 
-  // void _sendMessage() {
-  //   if (_controller.text.isNotEmpty) {
-  //     _channel?.sink.add(_controller.text);
-  //   }
-  // }
-
-  // @override
-  // void dispose() {
-  //   _channel?.sink.close();
-  //   super.dispose();
-  // }
-
-  // Widget _messaageView(AsyncSnapshot<Object?> snapshot) {
-  //   var data = "${snapshot.data}";
-  //   var message = json.decode(data);
-  //   messages.add(message);
-  //   print("-----message------list");
-  //   print(messages);
-  //   return Expanded(
-  //     child: ListView.builder(
-  //       itemCount: messages.length,
-  //       itemBuilder: (ctx, idx) {
-  //         return Padding(
-  //             padding: EdgeInsets.all(2.0),
-  //             child: Row(
-  //               mainAxisAlignment: messages[idx]["id"] == "1"
-  //                   ? MainAxisAlignment.end
-  //                   : MainAxisAlignment.start,
-  //               children: [
-  //                 Text(messages[idx]["message"]),
-  //               ],
-  //             ));
-  //       },
-  //     ),
-  //   );
-  // }
-
-  // _webSocketPage() {
-  //   return Padding(
-  //     padding: const EdgeInsets.all(20.0),
-  //     child: Column(
-  //       crossAxisAlignment: CrossAxisAlignment.start,
-  //       children: [
-  //         Row(
-  //           children: [
-  //             Expanded(
-  //               child: Container(
-  //                 child: Padding(
-  //                   padding: EdgeInsets.only(
-  //                       left: 15.0, right: 15.0, top: 5, bottom: 5),
-  //                   child: Form(
-  //                       child: TextFormField(
-  //                     controller: _pathController,
-  //                     decoration: InputDecoration(
-  //                         border: OutlineInputBorder(
-  //                           borderRadius:
-  //                               BorderRadius.all(Radius.circular(4.0)),
-  //                         ),
-  //                         labelText: 'enter_path'.tr()),
-  //                   )),
-  //                 ),
-  //               ),
-  //             ),
-  //             !isConnected
-  //                 ? SizedBox(
-  //                     width: 70,
-  //                     child: ElevatedButton(
-  //                       style: ButtonStyle(backgroundColor:
-  //                           MaterialStateProperty.resolveWith<Color>(
-  //                               (Set<MaterialState> states) {
-  //                         if (states.contains(MaterialState.pressed))
-  //                           return Theme.of(context)
-  //                               .primaryColor
-  //                               .withOpacity(1);
-  //                         else if (states.contains(MaterialState.disabled))
-  //                           return Colors.black26;
-  //                         return Theme.of(context).primaryColor; //
-  //                       })),
-  //                       onPressed: () {
-  //                         setState(() {
-  //                           _channel =
-  //                               wsAPiLoader.getConnect(_pathController.text);
-  //                           isConnected = true;
-  //                         });
-  //                       },
-  //                       child: Text(LocaleKeys.connect).tr(),
-  //                     ),
-  //                   )
-  //                 : SizedBox(
-  //                     width: 70,
-  //                     child: ElevatedButton(
-  //                       style: ButtonStyle(backgroundColor:
-  //                           MaterialStateProperty.resolveWith<Color>(
-  //                               (Set<MaterialState> states) {
-  //                         if (states.contains(MaterialState.pressed))
-  //                           return Theme.of(context)
-  //                               .primaryColor
-  //                               .withOpacity(1);
-  //                         else if (states.contains(MaterialState.disabled))
-  //                           return Colors.black26;
-  //                         return Theme.of(context).primaryColor; //
-  //                       })),
-  //                       onPressed: () {
-  //                         setState(() {
-  //                           _channel?.sink.close();
-  //                           isConnected = false;
-  //                         });
-  //                       },
-  //                       child: Text(
-  //                         "",
-  //                         // LocaleKeys.cancle,
-  //                         softWrap: true,
-  //                       ),
-  //                     ),
-  //                   ),
-  //           ],
-  //         ),
-  //         Row(
-  //           children: [
-  //             Expanded(
-  //               child: Container(
-  //                 child: Padding(
-  //                   padding: EdgeInsets.only(
-  //                       left: 15.0, right: 15.0, top: 5, bottom: 5),
-  //                   child: Form(
-  //                       child: TextFormField(
-  //                     controller: _headerController,
-  //                     onChanged: (value) {
-  //                       setState(() {
-  //                         headers = _headerController.text;
-  //                       });
-  //                     },
-  //                     decoration: InputDecoration(
-  //                       labelText: 'headers',
-  //                       border: OutlineInputBorder(
-  //                         borderRadius: BorderRadius.all(Radius.circular(4.0)),
-  //                       ),
-  //                     ),
-  //                   )),
-  //                 ),
-  //               ),
-  //             ),
-  //             SizedBox(
-  //               width: 70,
-  //             )
-  //           ],
-  //         ),
-  //         Row(
-  //           children: [
-  //             Expanded(
-  //               child: Container(
-  //                 // color: Colors.,
-  //                 child: Padding(
-  //                   padding: EdgeInsets.only(
-  //                       left: 15.0, right: 15.0, top: 5, bottom: 5),
-  //                   child: Form(
-  //                     child: TextFormField(
-  //                       controller: _controller,
-  //                       decoration: InputDecoration(
-  //                           border: OutlineInputBorder(
-  //                             borderRadius:
-  //                                 BorderRadius.all(Radius.circular(4.0)),
-  //                           ),
-  //                           labelText: "send_message_ws".tr()),
-  //                     ),
-  //                   ),
-  //                 ),
-  //               ),
-  //             ),
-  //             SizedBox(
-  //               width: 70,
-  //               child: ElevatedButton(
-  //                 style: ButtonStyle(backgroundColor:
-  //                     MaterialStateProperty.resolveWith<Color>(
-  //                         (Set<MaterialState> states) {
-  //                   if (states.contains(MaterialState.pressed))
-  //                     return Theme.of(context).primaryColor.withOpacity(1);
-  //                   else if (states.contains(MaterialState.disabled))
-  //                     return Colors.black26;
-  //                   return Theme.of(context).primaryColor; //
-  //                 })),
-  //                 onPressed: () {
-  //                   _sendMessage();
-  //                 },
-  //                 child: Text(LocaleKeys.send).tr(),
-  //               ),
-  //             ),
-  //           ],
-  //         ),
-  //         const SizedBox(height: 24),
-  //         _channel != null
-  //             ? StreamBuilder(
-  //                 // initialData: '{"message": "welcome", "id": "1"}',
-  //                 stream: _channel?.stream,
-  //                 builder: (context, snapshot) {
-  //                   print(snapshot.connectionState);
-  //                   if (snapshot.hasData) {
-  //                     return _messaageView(snapshot);
-  //                   } else if (snapshot.connectionState ==
-  //                       ConnectionState.none) {
-  //                     return Center(child: Text("${snapshot.error}"));
-  //                   } else if (snapshot.connectionState ==
-  //                       ConnectionState.done) {
-  //                     // _channel?.stream.listen((event) {}, onError: (e) {
-  //                     //   setState(() {
-  //                     //     error = "$e";
-  //                     //   });
-  //                     // });
-  //                     return Center(child: Text("$error"));
-  //                   }
-  //                   return Center(
-  //                     child: CircularProgressIndicator(),
-  //                   );
-  //                 },
-  //               )
-  //             : Center(child: Text(LocaleKeys.connect_to_socket).tr()),
-  //       ],
-  //     ),
-  //   );
-  // }
-
   Widget _bottomNavigationBar() {
     bool bap = true;
     return bap == true
         ? BottomNavigationBar(
+            unselectedItemColor: Theme.of(context).backgroundColor,
+            type: BottomNavigationBarType.fixed,
+            // backgroundColor: Colors.black,
             items: [
+              // rest-api.png
               BottomNavigationBarItem(
-                  icon: Icon(Icons.web), label: 'websocket'),
+                  icon: ImageIcon(AssetImage("assets/icon/websocket.png")),
+                  label: 'websocket'),
               BottomNavigationBarItem(icon: Icon(Icons.public), label: 'api'),
+              BottomNavigationBarItem(
+                  icon: ImageIcon(AssetImage("assets/icon/bug_test.png")),
+                  label: 'test'),
               BottomNavigationBarItem(
                   icon: Icon(Icons.settings), label: 'settings'.tr()),
             ],
             onTap: _onTappedBar,
-            selectedItemColor: Theme.of(context).primaryColorLight,
+            selectedItemColor: Theme.of(context).primaryColor,
             currentIndex: _selectedIndex,
           )
         : BottomAppBar(
@@ -512,5 +297,18 @@ class _MyHomePageState extends State<MyHomePage> {
       _selectedIndex = value;
     });
     // _pageController.jumpToPage(value);
+  }
+}
+
+class BugTestPage extends StatelessWidget {
+  const BugTestPage({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      child: Center(
+        child: Text("bug test"),
+      ),
+    );
   }
 }
