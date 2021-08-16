@@ -50,14 +50,6 @@ class HeaderDialog extends StatelessWidget {
                             ),
                           ),
                         ),
-                        // Spacer(),
-                        // Container(
-                        //   color: Colors.black,
-                        //   child: VerticalDivider(
-                        //     // width: 2,
-                        //     color: Colors.black,
-                        //   ),
-                        // ),
                         Container(child: Text("|")),
                         Container(
                           width: 150,

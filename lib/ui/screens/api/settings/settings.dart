@@ -4,6 +4,8 @@ import 'package:settings_ui/settings_ui.dart';
 import 'package:theme_provider/theme_provider.dart';
 import 'package:websocket_tester/ui/screens/api/settings/language_screen.dart';
 import 'package:easy_localization/easy_localization.dart';
+import 'package:websocket_tester/database/database.dart';
+import 'package:websocket_tester/ui/screens/api/settings/widget_dialog.dart';
 
 class SettingsScreen extends StatefulWidget {
   @override
@@ -13,7 +15,7 @@ class SettingsScreen extends StatefulWidget {
 class _SettingsScreenState extends State<SettingsScreen> {
   bool lockInBackground = true;
   bool notificationsEnabled = true;
-
+  final dbHelper = DatabaseHelper.instance;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -77,17 +79,21 @@ class _SettingsScreenState extends State<SettingsScreen> {
         SettingsSection(
           title: 'security'.tr(),
           tiles: [
-            SettingsTile.switchTile(
+            SettingsTile(
               switchActiveColor: Theme.of(context).primaryColor,
-              title: 'Lock app in background',
-              leading: Icon(Icons.phonelink_lock),
-              switchValue: lockInBackground,
-              onToggle: (bool value) {
-                setState(() {
-                  lockInBackground = value;
-                  notificationsEnabled = value;
-                });
+              title: 'wipe data',
+              leading: Icon(Icons.delete_forever),
+              onPressed: (_) {
+                showDialog(
+                    context: context, builder: (context) => DeleteAllDialog());
               },
+              // switchValue: lockInBackground,
+              // onToggle: (bool value) {
+              //   setState(() {
+              //     lockInBackground = value;
+              //     notificationsEnabled = value;
+              //   });
+              // },
             ),
             SettingsTile.switchTile(
                 switchActiveColor: Theme.of(context).primaryColor,
