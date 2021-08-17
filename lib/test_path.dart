@@ -10,6 +10,7 @@ void main(List<String> args) {
     result.add(map);
     result.add(inC);
   }
+  print(5 % 1);
   print(result[1].containsKey("in"));
 
   // final scriptDir = File(Platform.script.toFilePath()).parent;

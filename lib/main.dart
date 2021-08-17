@@ -12,6 +12,7 @@ import 'package:websocket_tester/ui/screens/api/apiPage.dart';
 import 'package:websocket_tester/ui/screens/api/form_bloc/cubit/apimanform_cubit.dart';
 import 'package:websocket_tester/ui/screens/api/settings/cubit/cubit/lang_cubit.dart';
 import 'package:websocket_tester/ui/screens/api/settings/settings.dart';
+import 'package:websocket_tester/ui/screens/test/test_page.dart';
 import 'package:websocket_tester/ui/screens/websocket/cubit/wsformcubit_cubit.dart';
 import 'package:websocket_tester/ui/screens/websocket/wsPage.dart';
 import 'package:websocket_tester/utils/themes.dart';
@@ -210,7 +211,7 @@ class _MyHomePageState extends State<MyHomePage> {
               WsPage(),
               // _webSocketPage(),
               ApiPage(),
-              BugTestPage(),
+              TestPage(),
               SettingsScreen(),
             ],
             index: _selectedIndex,

@@ -182,11 +182,9 @@ class _ApiPagedataState extends State<ApiPagedata>
                 },
                 controller: _headerController1,
                 decoration: InputDecoration(
-                    border: UnderlineInputBorder(),
-                    // border: OutlineInputBorder(
-                    //   borderRadius:
-                    //       BorderRadius.all(Radius.circular(4.0)),
-                    // ),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.all(Radius.circular(4.0)),
+                    ),
                     labelText: 'header'),
               ),
             ),
@@ -215,11 +213,10 @@ class _ApiPagedataState extends State<ApiPagedata>
                     controller: _dataController1,
 
                     decoration: InputDecoration(
-                        border: UnderlineInputBorder(),
-                        // border: OutlineInputBorder(
-                        //   borderRadius:
-                        //       BorderRadius.all(Radius.circular(4.0)),
-                        // ),
+                        // border: UnderlineInputBorder(),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.all(Radius.circular(4.0)),
+                        ),
                         labelText: 'body'.tr()),
                   ),
                 ),
@@ -234,124 +231,147 @@ class _ApiPagedataState extends State<ApiPagedata>
   _buildUrlRow() {
     return BlocBuilder<ApimanformCubit, ApimanformState>(
       builder: (context, state) {
-        return Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          crossAxisAlignment: CrossAxisAlignment.end,
-          children: [
-            Padding(
-              padding: const EdgeInsets.only(left: 8.0),
-              child: DropdownButton<String>(
-                focusNode: FocusNode(),
-                // style: TextStyle(backgroundColor: Theme.of(context).primaryColor),
-                focusColor: Theme.of(context).primaryColor,
-                // dropdownColor: Theme.of(context).primaryColor,
-                iconEnabledColor: Theme.of(context).primaryColor,
-                value: ddbValue,
-                items: <String>[
-                  "get",
-                  "post",
-                  "put",
-                  "patch",
-                  "head",
-                  "options"
-                ].map((String value) {
-                  return DropdownMenuItem(
-                    child: Text(value),
-                    value: value,
-                  );
-                }).toList(),
-                onChanged: (value) {
-                  setState(() {
-                    ddbValue = value;
-                  });
-                  context
-                      .read<ApimanformCubit>()
-                      .methodChanged(ddbValue ?? "get");
-                },
-              ),
-            ),
-            Expanded(
-              child: Padding(
-                padding:
-                    EdgeInsets.only(left: 30, right: 30.0, top: 8, bottom: 8),
-                child: Form(
-                    child: TextFormField(
-                  onChanged: (value) {
-                    context.read<ApimanformCubit>().urlChanged(value);
-                  },
-                  controller: _pathController1,
-                  decoration: InputDecoration(
-                      border: UnderlineInputBorder(),
-                      // border: OutlineInputBorder(
-                      //   borderRadius:
-                      //       BorderRadius.all(Radius.circular(4.0)),
-                      // ),
-                      labelText: 'enter_path'.tr()),
-                )),
-              ),
-            ),
-            Padding(
-              padding: EdgeInsets.only(
-                top: 1.h,
-                bottom: 1.h,
-                left: 1.w,
-                right: 1.w,
-              ),
-              child: !state.status.isSubmissionInProgress
-                  ? SizedBox(
-                      width: 15.w,
-                      child: ElevatedButton(
-                        style: ButtonStyle(backgroundColor:
-                            MaterialStateProperty.resolveWith<Color>(
-                                (Set<MaterialState> states) {
-                          if (states.contains(MaterialState.pressed))
-                            return Theme.of(context)
-                                .primaryColor
-                                .withOpacity(1);
-                          else if (states.contains(MaterialState.disabled))
-                            return Colors.black26;
-                          return Theme.of(context).primaryColor; //
-                        })),
-                        onPressed: state.status.isValidated
-                            ? () {
-                                context.read<ApimanformCubit>().formSummits();
-                              }
-                            : null,
-                        child: Text(
-                          "connect".tr(),
-                          style: TextStyle(),
+        return Container(
+          height: 12.h,
+          width: double.infinity,
+          child: SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.only(left: 8.0),
+                  child: DropdownButton<String>(
+                    focusNode: FocusNode(),
+                    // style: TextStyle(backgroundColor: Theme.of(context).primaryColor),
+                    focusColor: Theme.of(context).primaryColor,
+                    // dropdownColor: Theme.of(context).primaryColor,
+                    iconEnabledColor: Theme.of(context).primaryColor,
+                    value: ddbValue,
+                    items: <String>[
+                      "get",
+                      "post",
+                      "put",
+                      "patch",
+                      "head",
+                      "options"
+                    ].map((String value) {
+                      return DropdownMenuItem(
+                        child: Text(value),
+                        value: value,
+                      );
+                    }).toList(),
+                    onChanged: (value) {
+                      setState(() {
+                        ddbValue = value;
+                      });
+                      context
+                          .read<ApimanformCubit>()
+                          .methodChanged(ddbValue ?? "get");
+                    },
+                  ),
+                ),
+                SizedBox(
+                  height: 10.h,
+                  width: 60.w,
+                  child: Padding(
+                    padding:
+                        EdgeInsets.only(left: 8, right: 1, top: 8, bottom: 7),
+                    child: Form(
+                        child: TextFormField(
+                      onChanged: (value) {
+                        context.read<ApimanformCubit>().urlChanged(value);
+                      },
+                      controller: _pathController1,
+                      decoration: InputDecoration(
+                          border: OutlineInputBorder(
+                            borderRadius:
+                                BorderRadius.all(Radius.circular(4.0)),
+                          ),
+                          // border: OutlineInputBorder(
+                          //   borderRadius:
+                          //       BorderRadius.all(Radius.circular(4.0)),
+                          // ),
+                          labelText: 'enter_path'.tr()),
+                    )),
+                  ),
+                ),
+                Padding(
+                  padding: EdgeInsets.only(
+                    top: 1.h,
+                    bottom: 1.h,
+                    left: 1.w,
+                    right: 1.w,
+                  ),
+                  child: !state.status.isSubmissionInProgress
+                      ? SizedBox(
+                          width: SizerUtil.deviceType == DeviceType.mobile
+                              ? 20.w
+                              : 15.w,
+                          child: ElevatedButton(
+                            style: ButtonStyle(backgroundColor:
+                                MaterialStateProperty.resolveWith<Color>(
+                                    (Set<MaterialState> states) {
+                              if (states.contains(MaterialState.pressed))
+                                return Theme.of(context)
+                                    .primaryColor
+                                    .withOpacity(1);
+                              else if (states.contains(MaterialState.disabled))
+                                return Colors.black26;
+                              return Theme.of(context).primaryColor; //
+                            })),
+                            onPressed: state.status.isValidated
+                                ? () {
+                                    context
+                                        .read<ApimanformCubit>()
+                                        .formSummits();
+                                  }
+                                : null,
+                            child: Text(
+                              "connect".tr(),
+                              style: TextStyle(
+                                  fontSize:
+                                      SizerUtil.deviceType == DeviceType.mobile
+                                          ? 8.sp
+                                          : 9.sp),
+                            ),
+                          ),
+                        )
+                      : SizedBox(
+                          width: SizerUtil.deviceType == DeviceType.mobile
+                              ? 20.w
+                              : 15.w,
+                          child: ElevatedButton(
+                            style: ButtonStyle(backgroundColor:
+                                MaterialStateProperty.resolveWith<Color>(
+                                    (Set<MaterialState> states) {
+                              if (states.contains(MaterialState.pressed))
+                                return Theme.of(context)
+                                    .primaryColor
+                                    .withOpacity(1);
+                              else if (states.contains(MaterialState.disabled))
+                                return Colors.black26;
+                              return Theme.of(context).primaryColor; //
+                            })),
+                            onPressed: () {
+                              setState(() {
+                                isConnected = true;
+                              });
+                            },
+                            child: SizedBox(
+                              height: 13,
+                              width: 13,
+                              child: CircularProgressIndicator(
+                                  strokeWidth: 2.0,
+                                  backgroundColor: Colors.white),
+                            ),
+                          ),
                         ),
-                      ),
-                    )
-                  : SizedBox(
-                      width: 15.w,
-                      child: ElevatedButton(
-                        style: ButtonStyle(backgroundColor:
-                            MaterialStateProperty.resolveWith<Color>(
-                                (Set<MaterialState> states) {
-                          if (states.contains(MaterialState.pressed))
-                            return Theme.of(context)
-                                .primaryColor
-                                .withOpacity(1);
-                          else if (states.contains(MaterialState.disabled))
-                            return Colors.black26;
-                          return Theme.of(context).primaryColor; //
-                        })),
-                        onPressed: () {
-                          setState(() {
-                            isConnected = true;
-                          });
-                        },
-                        child: SizedBox(
-                          height: 13,
-                          width: 13,
-                          child: CircularProgressIndicator(
-                              strokeWidth: 2.0, backgroundColor: Colors.white),
-                        ),
-                      ),
-                    ),
+                ),
+              ],
             ),
-          ],
+          ),
         );
       },
     );
