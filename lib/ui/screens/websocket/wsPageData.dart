@@ -8,11 +8,11 @@ import 'package:formz/formz.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:web_socket_channel/io.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
-import 'package:websocket_tester/database/database.dart';
+import 'package:apiman/database/database.dart';
 
-import 'package:websocket_tester/ui/screens/websocket/cubit/wsformcubit_cubit.dart';
+import 'package:apiman/ui/screens/websocket/cubit/wsformcubit_cubit.dart';
 import 'package:sizer/sizer.dart';
-import 'package:websocket_tester/ws_service/web_socket_provider.dart';
+import 'package:apiman/ws_service/web_socket_provider.dart';
 
 class WsPageData extends StatefulWidget {
   final Map<String, dynamic> row;

@@ -1,0 +1,25 @@
+{
+    "title": "dummyApiTest",
+    "url": "http://127.0.0.1:8080",
+    "test": [
+        {
+            "anonCreateData": [
+                {
+                    "path": "/test/api/dummy"
+                },
+                {
+                    "method": "create"
+                },
+                {
+                    "assert": "200"
+                },
+                {
+                    "data": {
+                        "text": "test",
+                        "dev_id": "1"
+                    }
+                }
+            ]
+        }
+    ]
+}

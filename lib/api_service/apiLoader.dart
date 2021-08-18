@@ -1,7 +1,7 @@
 import 'dart:convert';
 
 import 'package:http/http.dart';
-import 'package:websocket_tester/api_service/apiService.dart';
+import 'package:apiman/api_service/apiService.dart';
 
 class ApiLoader {
   final ApiProvider apiProvider = ApiProvider();

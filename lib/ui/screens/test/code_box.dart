@@ -1,7 +1,7 @@
 import 'package:code_text_field/code_text_field.dart';
 import 'package:highlight/languages/all.dart';
 import 'package:flutter/material.dart';
-import 'package:websocket_tester/ui/screens/test/themes.dart';
+import 'package:apiman/ui/screens/test/themes.dart';
 
 class JsonCodeBox extends StatefulWidget {
   final String language;
@@ -154,8 +154,9 @@ class _InnerFieldState extends State<InnerField> {
   @override
   void initState() {
     super.initState();
-
     _codeController = CodeController(
+      // modifiers: ,
+
       webSpaceFix: false,
       text: CODE_SNIPPETS["json"],
       patternMap: {
@@ -189,5 +190,5 @@ class _InnerFieldState extends State<InnerField> {
 
 const CODE_SNIPPETS = {
   'json':
-      '[\n  {\n    "title": "apples",\n    "count": [12000, 20000],\n    "description": {"text": "...", "sensitive": false}\n  },\n  {\n    "title": "oranges",\n    "count": [17500, null],\n    "description": {"text": "...", "sensitive": false}\n  }\n]\n',
+      '[\n  {\n    "title": "DummyAPiTest",\n    "": [12000, 20000],\n    "description": {"text": "...", "sensitive": false}\n  },\n  {\n    "title": "oranges",\n    "count": [17500, null],\n    "description": {"text": "...", "sensitive": false}\n  }\n]\n',
 };

@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:settings_ui/settings_ui.dart';
 import 'package:easy_localization/easy_localization.dart';
-import 'package:websocket_tester/ui/screens/api/settings/cubit/cubit/lang_cubit.dart';
+import 'package:apiman/ui/screens/api/settings/cubit/cubit/lang_cubit.dart';
 
 class LanguagesScreen extends StatefulWidget {
   final int idx;

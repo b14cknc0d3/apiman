@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'package:sizer/sizer.dart';
 
-import 'package:websocket_tester/ui/screens/test/code_box.dart'; // imported the package
+import 'package:apiman/ui/screens/test/code_box.dart'; // imported the package
 
 class TestPage extends StatefulWidget {
   const TestPage({Key? key}) : super(key: key);

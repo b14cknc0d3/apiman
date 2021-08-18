@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:websocket_tester/ui/screens/api/apiPageData.dart';
+import 'package:apiman/ui/screens/api/apiPageData.dart';
 
 // ignore: must_be_immutable
 class CustomTabView extends StatefulWidget {

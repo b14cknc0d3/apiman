@@ -5,7 +5,7 @@ import 'dart:math';
 
 import 'package:web_socket_channel/io.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
-import 'package:websocket_tester/ws_service/web_socket_provider.dart';
+import 'package:apiman/ws_service/web_socket_provider.dart';
 
 class WsAPiLoader {
   static late String token;

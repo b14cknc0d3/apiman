@@ -4,19 +4,19 @@ import 'package:sizer/sizer.dart';
 
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:websocket_tester/api_service/apiLoader.dart';
-import 'package:websocket_tester/bloc_observer.dart';
-import 'package:websocket_tester/generated/codegen_loader.g.dart';
+import 'package:apiman/api_service/apiLoader.dart';
+import 'package:apiman/bloc_observer.dart';
+import 'package:apiman/generated/codegen_loader.g.dart';
 
-import 'package:websocket_tester/ui/screens/api/apiPage.dart';
-import 'package:websocket_tester/ui/screens/api/form_bloc/cubit/apimanform_cubit.dart';
-import 'package:websocket_tester/ui/screens/api/settings/cubit/cubit/lang_cubit.dart';
-import 'package:websocket_tester/ui/screens/api/settings/settings.dart';
-import 'package:websocket_tester/ui/screens/test/test_page.dart';
-import 'package:websocket_tester/ui/screens/websocket/cubit/wsformcubit_cubit.dart';
-import 'package:websocket_tester/ui/screens/websocket/wsPage.dart';
-import 'package:websocket_tester/utils/themes.dart';
-import 'package:websocket_tester/widgets/splash.dart';
+import 'package:apiman/ui/screens/api/apiPage.dart';
+import 'package:apiman/ui/screens/api/form_bloc/cubit/apimanform_cubit.dart';
+import 'package:apiman/ui/screens/api/settings/cubit/cubit/lang_cubit.dart';
+import 'package:apiman/ui/screens/api/settings/settings.dart';
+import 'package:apiman/ui/screens/test/test_page.dart';
+import 'package:apiman/ui/screens/websocket/cubit/wsformcubit_cubit.dart';
+import 'package:apiman/ui/screens/websocket/wsPage.dart';
+import 'package:apiman/utils/themes.dart';
+import 'package:apiman/widgets/splash.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import 'package:sqflite/sqflite.dart' show databaseFactory;
 
@@ -25,9 +25,6 @@ import 'package:sqlite3/sqlite3.dart' hide Row;
 import 'package:sqlite3_library_windows/sqlite3_library_windows.dart';
 import 'package:theme_provider/theme_provider.dart';
 import 'package:easy_localization/easy_localization.dart';
-import 'package:websocket_tester/ws_service/web_socket_provider.dart';
-
-import 'package:websocket_tester/ws_service/ws_api_loader.dart';
 
 // late final Database db;
 void main() async {

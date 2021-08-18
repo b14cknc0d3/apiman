@@ -1,7 +1,7 @@
 import 'dart:collection';
 
 import 'package:flutter/material.dart';
-import 'package:websocket_tester/ui/screens/api/apiPageData.dart';
+import 'package:apiman/ui/screens/api/apiPageData.dart';
 
 class TabIcon extends StatelessWidget {
   final Function(Map) callback;

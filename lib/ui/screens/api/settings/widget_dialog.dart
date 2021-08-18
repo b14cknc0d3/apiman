@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:websocket_tester/database/database.dart';
+import 'package:apiman/database/database.dart';
 
 class DeleteAllDialog extends StatelessWidget {
   final dbHelper = DatabaseHelper.instance;

@@ -4,12 +4,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'package:flutter_highlight/themes/solarized-light.dart';
-import 'package:websocket_tester/api_service/apiLoader.dart';
-import 'package:websocket_tester/database/database.dart';
-import 'package:websocket_tester/ui/screens/api/form_bloc/cubit/apimanform_cubit.dart';
-import 'package:websocket_tester/utils/highlight.dart';
+import 'package:apiman/api_service/apiLoader.dart';
+import 'package:apiman/database/database.dart';
+import 'package:apiman/ui/screens/api/form_bloc/cubit/apimanform_cubit.dart';
+import 'package:apiman/utils/highlight.dart';
 import 'package:flutter_html/flutter_html.dart';
-import 'package:websocket_tester/widgets/dialogButton.dart';
+import 'package:apiman/widgets/dialogButton.dart';
 import 'package:formz/formz.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:sizer/sizer.dart';
@@ -497,7 +497,7 @@ class _ApiPagedataState extends State<ApiPagedata>
     }
     return result != null
         ? Container(
-            height: 24,
+            height: 6.h,
             child: SingleChildScrollView(
               scrollDirection: Axis.horizontal,
               child: Row(
@@ -505,15 +505,23 @@ class _ApiPagedataState extends State<ApiPagedata>
                   Padding(
                     padding: const EdgeInsets.only(left: 8.0, right: 8.0),
                     child: TextButton.icon(
-                      icon: Icon(
-                        Icons.language,
-                        color: scolor,
-                      ),
+                      icon: Icon(Icons.language,
+                          color: (result['status_code'].toString() == "200" ||
+                                  result['status_code'].toString() == "201" ||
+                                  result['status_code'].toString() == "204")
+                              ? Colors.green[700]
+                              : Colors.red[700]),
                       label: Text(
                           "status".tr(args: [": ${result['status_code']}"]),
                           style: TextStyle(
-                            color: scolor,
-                          )),
+                              color:
+                                  (result['status_code'].toString() == "200" ||
+                                          result['status_code'].toString() ==
+                                              "201" ||
+                                          result['status_code'].toString() ==
+                                              "204")
+                                      ? Colors.green[700]
+                                      : Colors.red[700])),
                       onPressed: null,
                     ),
                   ),

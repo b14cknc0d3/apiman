@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:tabbed_view/tabbed_view.dart';
-import 'package:websocket_tester/database/database.dart';
+import 'package:apiman/database/database.dart';
 
-import 'package:websocket_tester/ui/screens/api/apiPageData.dart';
+import 'package:apiman/ui/screens/api/apiPageData.dart';
 
 import 'package:easy_localization/easy_localization.dart';
 

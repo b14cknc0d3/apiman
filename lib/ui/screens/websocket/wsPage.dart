@@ -2,9 +2,9 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:sizer/sizer.dart';
 import 'package:tabbed_view/tabbed_view.dart';
-import 'package:websocket_tester/database/database.dart';
+import 'package:apiman/database/database.dart';
 
-import 'package:websocket_tester/ui/screens/websocket/wsPageData.dart';
+import 'package:apiman/ui/screens/websocket/wsPageData.dart';
 
 class WsPage extends StatefulWidget {
   const WsPage({Key? key}) : super(key: key);

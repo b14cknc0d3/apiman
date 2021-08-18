@@ -1,5 +1,5 @@
-name: websocket_tester
-description: A new Flutter project.
+name: apiman
+description: RESTful api and WebSocket Client
 
 # The following line prevents the package from being accidentally published to
 # pub.dev using `pub publish`. This is preferred for private packages.

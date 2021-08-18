@@ -8,8 +8,8 @@ import 'package:equatable/equatable.dart';
 import 'package:formz/formz.dart';
 import 'package:web_socket_channel/io.dart';
 
-import 'package:websocket_tester/model/formz/header_body.dart';
-import 'package:websocket_tester/ws_service/web_socket_provider.dart';
+import 'package:apiman/model/formz/header_body.dart';
+import 'package:apiman/ws_service/web_socket_provider.dart';
 
 part 'wsformcubit_state.dart';
 

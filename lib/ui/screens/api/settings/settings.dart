@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 
 import 'package:settings_ui/settings_ui.dart';
 import 'package:theme_provider/theme_provider.dart';
-import 'package:websocket_tester/ui/screens/api/settings/language_screen.dart';
+import 'package:apiman/ui/screens/api/settings/language_screen.dart';
 import 'package:easy_localization/easy_localization.dart';
-import 'package:websocket_tester/database/database.dart';
-import 'package:websocket_tester/ui/screens/api/settings/widget_dialog.dart';
+import 'package:apiman/database/database.dart';
+import 'package:apiman/ui/screens/api/settings/widget_dialog.dart';
 
 class SettingsScreen extends StatefulWidget {
   @override

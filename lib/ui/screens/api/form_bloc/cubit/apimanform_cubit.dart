@@ -3,8 +3,8 @@ import 'dart:convert';
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:formz/formz.dart';
-import 'package:websocket_tester/api_service/apiLoader.dart';
-import 'package:websocket_tester/model/formz/header_body.dart';
+import 'package:apiman/api_service/apiLoader.dart';
+import 'package:apiman/model/formz/header_body.dart';
 
 part 'apimanform_state.dart';
 
